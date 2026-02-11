@@ -1,0 +1,23 @@
+@startsalt
+{+
+  {* File | Edit | Source | View }
+  {/ <b>Home</b> | News | My Articles | Profile | Admin }
+  {
+    . | <b>Tableau de Bord Reporter</b> | .
+    {
+      [+ Create New Article] | [Search...]
+    }
+    {
+      <b>Title</b> | <b>Date</b> | <b>Status</b> | <b>Tags</b> | <b>Actions</b>
+      Le réchauffement climatique | 2026-02-11 | Published | Science | [Edit] [Unpublish]
+      Nouvelle loi éducation | 2026-02-10 | Draft | Education | [Edit] [Delete]
+      Match de Foot hier | 2026-02-09 | Published | Sport | [Edit] [Unpublish]
+    }
+    ---
+    {
+      <b>Stats Rapides :</b>
+      Total Vues: 1,240 | Articles: 12 | Rang: #3
+    }
+  }
+}
+@enduml

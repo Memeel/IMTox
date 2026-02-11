@@ -1,0 +1,16 @@
+@startwbs
+* Accueil (Top 5 Headlines)
+** Inscription / Connexion (Reporter)
+*** Profil (Update/Delete info)
+*** Dashboard Reporter
+**** Créer un article (Draft)
+**** Mes Articles (Update, Publish/Unpublish, Delete)
+** Lecture News
+*** Liste par Tag (Top 5)
+*** Liste par Reporter (Top 5)
+*** Article Detail (Contenu, Auteur, Date, Tags, Counter+1)
+** Administration (Admin Only)
+*** Gestion des Reporters (Lock/Unlock/Remove)
+*** Statistiques (Top 5 News - Chart)
+*** Statistiques (Top 5 Reporters - Chart)
+@endwbs
