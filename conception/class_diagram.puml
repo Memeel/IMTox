@@ -1,0 +1,51 @@
+@startuml IMTox
+
+hide empty members
+
+class NewsReport {
+    - title: String
+    - content: String
+    - createdAt: DateTime
+    - publishedAt: DateTime
+    - updatedAt: DateTime
+    - numberOfViews: Integer
+}
+
+class ReportTag {
+    - name: String
+    - description: String
+}
+
+enum ReportState {
+    DRAFT
+    PUBLISHED
+}
+
+NewsReport "0..*" --> "0..*" ReportTag : has
+NewsReport --> "1" ReportState : has
+
+class User {
+    - name: String
+    - firstname: String
+    - email: String
+    - password: String
+}
+
+enum UserRole {
+    ADMIN
+    REPORTER
+    READER
+}
+
+enum UserState {
+    ACTIVE
+    BANNED
+    DELETED
+}
+
+User --> "1" UserRole : has
+User --> "1" UserState : has
+
+NewsReport "0..*" --> "1" User : written by
+
+@enduml
