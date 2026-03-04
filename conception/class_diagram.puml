@@ -13,7 +13,6 @@ class NewsReport {
 
 class ReportTag {
     - name: String
-    - description: String
 }
 
 enum ReportState {
@@ -25,10 +24,10 @@ NewsReport "0..*" --> "0..*" ReportTag : has
 NewsReport --> "1" ReportState : has
 
 class User {
-    - name: String
-    - firstname: String
-    - email: String
+    - login: String
     - password: String
+    - personalInformations: Dict
+    - preferences: Dict
 }
 
 enum UserRole {
@@ -47,5 +46,45 @@ User --> "1" UserRole : has
 User --> "1" UserState : has
 
 NewsReport "0..*" --> "1" User : written by
+
+class NewsSystem {
+    + addReport(NewsReport)
+    + removeReport(NewsReport)
+    ..
+    + search(options: Dict): List<NewsReport>
+    ..
+    + updateTitle(NewsReport, String)
+    + updateContent(NewsReport, String)
+    ..
+    + publish(NewsReport)
+    + unpublish(NewsReport)
+    ..
+    + addTag(NewsReport, ReportTag)
+    + removeTag(NewsReport, ReportTag)
+}
+
+class UserSystem {
+    + registerUser(User)
+    + loginUser(email, password): User
+    ..
+    + search(options: Dict): List<User>
+    ..
+    + updatePassword(User, String, String)
+    + updatePersonalInformations(User, Dict)
+    + updatePreferences(User, Dict)
+    ..
+    + lock(User)
+    + unlock(User)
+    + delete(User)
+}
+
+class TagSystem {
+    + addTag(tag: ReportTag)
+    + removeTag(tag: ReportTag)
+}
+
+UserSystem --> "0..*" User : manages
+NewsSystem --> "0..*" NewsReport : manages
+TagSystem --> "0..*" ReportTag : manages
 
 @enduml
