@@ -1,0 +1,57 @@
+// --- Énumérations ---
+
+Enum report_state {
+  DRAFT
+  PUBLISHED
+}
+
+Enum user_role {
+  ADMIN
+  REPORTER
+  READER
+}
+
+Enum user_state {
+  ACTIVE
+  BANNED
+  DELETED
+}
+
+// --- Tables ---
+
+Table user {
+  id integer [primary key, increment]
+  login varchar [unique, not null]
+  password varchar [not null]
+  mail varchar [not null]
+  fullname varchar [not null]
+  role user_role [default: 'READER']
+  state user_state [default: 'ACTIVE']
+}
+
+Table news_report {
+  id integer [primary key, increment]
+  title varchar [not null]
+  content text
+  created_at timestamp [default: `now()`]
+  published_at timestamp
+  updated_at timestamp
+  number_of_views integer [default: 0]
+  author_id integer [ref: > user.id]
+  state report_state [default: 'DRAFT']
+}
+
+Table report_tag {
+  id integer [primary key, increment]
+  name varchar [unique, not null]
+}
+
+// Table de jointure pour la relation Many-to-Many (NewsReport <-> ReportTag)
+Table news_report_tag {
+  report_id integer [ref: > news_report.id]
+  tag_id integer [ref: > report_tag.id]
+  
+  indexes {
+    (report_id, tag_id) [pk] 
+  }
+}
