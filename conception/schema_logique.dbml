@@ -8,7 +8,6 @@ Enum report_state {
 Enum user_role {
   ADMIN
   REPORTER
-  READER
 }
 
 Enum user_state {
@@ -25,7 +24,7 @@ Table user {
   password varchar [not null]
   mail varchar [not null]
   fullname varchar [not null]
-  role user_role [default: 'READER']
+  role user_role [default: 'REPORTER']
   state user_state [default: 'ACTIVE']
 }
 
