@@ -1,0 +1,4 @@
+<form method="post" action="{{ path('app_admin_user_lock', {'id': user.id}) }}" onsubmit="return confirm('Are you sure you want to lock this user?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('lock' ~ user.id) }}">
+    <button class="btn">Lock</button>
+</form>
