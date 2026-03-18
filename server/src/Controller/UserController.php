@@ -36,6 +36,9 @@ final class UserController extends AbstractController
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $form->remove("role");
+        $form->remove("state");
+
         return $this->render('user/new.html.twig', [
             'user' => $user,
             'form' => $form,
@@ -61,6 +64,10 @@ final class UserController extends AbstractController
 
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
         }
+
+        # TODO: Remove these fields for non-admin users only
+        $form->remove("role");
+        $form->remove("state");
 
         return $this->render('user/edit.html.twig', [
             'user' => $user,
