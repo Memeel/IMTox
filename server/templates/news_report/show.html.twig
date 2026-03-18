@@ -1,3 +1,5 @@
+<!-- Auteurs: Sadok LAJMI, Mélina WANG -->
+
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ news_report.title }}{% endblock %}
@@ -7,7 +9,7 @@
 
     {# Back link #}
     <div>
-        <a href="{{ path('app_news_report_index') }}">← Back to Articles</a>
+        <a href="{{ path('show_drafts') }}">← Back to Articles</a>
     </div>
 
     {# Category (optional if you have one) #}
@@ -34,7 +36,7 @@
 
     {# Footer actions #}
     <div class="actions">
-        <a href="{{ path('app_news_report_edit', {'id': news_report.id}) }}">Edit</a>
+        <a href="{{ path('edit_report', {'id': news_report.id}) }}">Edit</a>
         {{ include('news_report/_delete_form.html.twig') }}
     </div>
 

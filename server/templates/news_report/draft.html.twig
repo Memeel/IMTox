@@ -1,0 +1,47 @@
+<!-- Auteurs: Sadok LAJMI, Mélina WANG -->
+
+{% extends 'base.html.twig' %}
+
+{% block title %}NewsReport index{% endblock %}
+
+{% block body %}
+    <h1>My Articles</h1>
+    <button class="btn"><a href="{{ path('create_report') }}">Create Article</a></button>
+
+    {% include "articles_header.html.twig" %}
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Author</th>
+                <th>Published At</th>
+                <th>Updated At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for news_report in draft_report %}
+            <tr>
+                <td>{{ news_report.id }}</td>
+                <td>{{ news_report.title }}</td>
+                <td>{{ news_report.category }}</td>
+                <td>{{ news_report.author.fullName ?? 'Unknown' }}</td>
+                <td>{{ news_report.publishedAt ? news_report.publishedAt|date('Y-m-d H:i') : '' }}</td>
+                <td>{{ news_report.updateAt ? news_report.updateAt|date('Y-m-d H:i') : '' }}</td>
+                <td>
+                    <a href="{{ path('show_report', {'id': news_report.id}) }}">Show</a>
+                    <a href="{{ path('edit_report', {'id': news_report.id}) }}">Edit</a>
+                    {{ include('news_report/_delete_form.html.twig') }}
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="7">No drafts found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+{% endblock %}

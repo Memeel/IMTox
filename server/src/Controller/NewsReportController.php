@@ -12,18 +12,26 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/news/report')]
+#[Route('/account/article')]
 final class NewsReportController extends AbstractController
 {
-    #[Route(name: 'app_news_report_index', methods: ['GET'])]
+    #[Route('/draft', name: 'show_drafts', methods: ['GET'])]
     public function index(NewsReportRepository $newsReportRepository): Response
     {
-        return $this->render('news_report/index.html.twig', [
-            'news_reports' => $newsReportRepository->findAll(),
+        return $this->render('news_report/draft.html.twig', [
+            'draft_report' => $newsReportRepository->findDrafts()
         ]);
     }
 
-    #[Route('/new', name: 'app_news_report_new', methods: ['GET', 'POST'])]
+    #[Route('/published', name: 'show_published', methods: ['GET'])]
+    public function showPublished(NewsReportRepository $newsReportRepository): Response
+    {
+        return $this->render('news_report/published.html.twig', [
+            'published_report' => $newsReportRepository->findPublished()
+        ]);
+    }
+
+    #[Route('/create', name: 'create_report', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $newsReport = new NewsReport();
@@ -35,7 +43,7 @@ final class NewsReportController extends AbstractController
             $entityManager->persist($newsReport);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('show_drafts', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('news_report/new.html.twig', [
@@ -44,7 +52,7 @@ final class NewsReportController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_news_report_show', methods: ['GET'])]
+    #[Route('/{id}/show', name: 'show_report', methods: ['GET'])]
     public function show(NewsReport $newsReport): Response
     {
         return $this->render('news_report/show.html.twig', [
@@ -52,7 +60,7 @@ final class NewsReportController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_news_report_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'edit_report', methods: ['GET', 'POST'])]
     public function edit(Request $request, NewsReport $newsReport, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(NewsReportType::class, $newsReport);
@@ -62,7 +70,7 @@ final class NewsReportController extends AbstractController
             $this->applySaveAction($newsReport, $request->request->getString('save_action'));
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('show_drafts', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('news_report/edit.html.twig', [
@@ -71,7 +79,7 @@ final class NewsReportController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_news_report_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'delete_report', methods: ['POST'])]
     public function delete(Request $request, NewsReport $newsReport, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$newsReport->getId(), $request->getPayload()->getString('_token'))) {
@@ -79,9 +87,10 @@ final class NewsReportController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('show_drafts', [], Response::HTTP_SEE_OTHER);
     }
 
+    // Auteurs: Sadok LAJMI, Mélina WANG
     private function applySaveAction(NewsReport $newsReport, string $saveAction): void
     {
         $now = new DateTimeImmutable();

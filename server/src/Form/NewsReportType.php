@@ -12,6 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class NewsReportType extends AbstractType
 {
+    // Auteurs: Sadok LAJMI, Mélina WANG
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
