@@ -43,7 +43,8 @@ final class SearchController extends AbstractController
             'reporters' => $reporters,
             'articlesCount' => $articlesCount,
             'reportersCount' => $reportersCount,
-            'searchType' => $searchType
+            'searchType' => $searchType,
+            'search' => $search
         ]);
     }
 }
