@@ -10,21 +10,7 @@
 </style>
 
 <div class="search-results">
-    <h1>Search Results for "{{ app.request.query.get('search') }}"</h1>
-
-    <form method="get" action="{{ path('app_search') }}">
-        <div class="filters">
-            <input type="text" name="search" placeholder="Search..." value="{{ app.request.query.get('search') }}">
-
-            <select name="search_type">
-                <option value="">All</option>
-                <option value="articles" {% if app.request.query.get('search_type') == 'articles' %}selected{% endif %}>Articles</option>
-                <option value="reporters" {% if app.request.query.get('search_type') == 'reporters' %}selected{% endif %}>Reporters</option>
-            </select>
-
-            <button type="submit">Filter</button>
-        </div>
-    </form>
+    <h1>Search Results for "{{ search }}"</h1>
 
     {% if searchType == 'articles' or searchType == '' %}
         {% if articlesCount > 0 %}
@@ -46,7 +32,7 @@
             {% endfor %}
         </table>
         {% else %}
-            <p>No articles found.</p>
+            <h2>No articles found.</h2>
         {% endif %}
     {% endif %}
 
@@ -66,7 +52,7 @@
             {% endfor %}
         </table>
     {% else %}
-        <p>No reporters found.</p>
+        <h2>No reporters found.</h2>
     {% endif %}
     {% endif %}
 
