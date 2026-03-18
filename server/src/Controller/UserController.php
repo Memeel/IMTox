@@ -11,10 +11,15 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 #[Route('/user')]
 final class UserController extends AbstractController
 {
+    public function __construct(
+        private RequestStack $requestStack,
+    ) {
+    }
     #[Route(name: 'app_user_index', methods: ['GET'])]
     public function index(UserRepository $userRepository): Response
     {
@@ -24,18 +29,44 @@ final class UserController extends AbstractController
     }
 
     #[Route('/login', name: 'app_user_login', methods: ['GET', 'POST'])]
-    public function login(Request $request, EntityManagerInterface $entityManager){
+    public function login(UserPasswordHasherInterface $passwordHasher,UserRepository $userRepository,Request $request, EntityManagerInterface $entityManager){
+        
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
         $form->remove("role");
         $form->remove("state");
+        $form->remove("mail");
+        $form->remove("fullname");
+        $form->handleRequest($request);
+        $code = Response::HTTP_OK;
+        $statusCode = $form->isSubmitted() ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_OK;
         if ($form->isSubmitted() && $form->isValid()) {
-            
+            $plaintextPassword = $user->getPassword();
+            $user = $userRepository->findOneBy(["login" => $user->getLogin()]);
+            if(!$user){
+                $code=Response::HTTP_UNPROCESSABLE_ENTITY;
+                $this->addFlash('danger', 'Invalid username');
+            }else{
+            $isValid = $passwordHasher->isPasswordValid(
+                $user,
+                $plaintextPassword
+            );
+            if ($isValid){
+                $session=$this->requestStack->getSession();
+                $session->set("login", $user->getLogin());
+                return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+            }else{
+                $code=Response::HTTP_UNPROCESSABLE_ENTITY;
+                $this->addFlash('danger', 'Invalid passowrd');
+            }
         }
-        return $this->render('user/login.html.twig', [
+        }
+
+        $response=$this->render('user/login.html.twig', [
             'form' => $form,
         ]);
+        $response->setStatusCode($statusCode);
+        return $response;
     }
 
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
