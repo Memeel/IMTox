@@ -13,14 +13,14 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-#[Route('/user')]
+#[Route]
 final class UserController extends AbstractController
 {
     public function __construct(
         private RequestStack $requestStack,
     ) {
     }
-    #[Route(name: 'app_user_index', methods: ['GET'])]
+    #[Route(name: 'app_my_account', methods: ['GET'])]
     public function index(UserRepository $userRepository): Response
     {
         return $this->render('user/index.html.twig', [
@@ -28,9 +28,8 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/login', name: 'app_user_login', methods: ['GET', 'POST'])]
-    public function login(UserPasswordHasherInterface $passwordHasher,UserRepository $userRepository,Request $request, EntityManagerInterface $entityManager){
-        
+    #[Route('/signin', name: 'app_user_login', methods: ['GET', 'POST'])]
+    public function login(UserPasswordHasherInterface $passwordHasher,UserRepository $userRepository,Request $request, EntityManagerInterface $entityManager){     
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
         $form->remove("role");
@@ -38,7 +37,7 @@ final class UserController extends AbstractController
         $form->remove("mail");
         $form->remove("fullname");
         $form->handleRequest($request);
-        $code = Response::HTTP_OK;
+        
         $statusCode = $form->isSubmitted() ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_OK;
         if ($form->isSubmitted() && $form->isValid()) {
             $plaintextPassword = $user->getPassword();
@@ -69,8 +68,8 @@ final class UserController extends AbstractController
         return $response;
     }
 
-    #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
-    public function new(UserPasswordHasherInterface $passwordHasher, Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/signup', name: 'app_user_signup', methods: ['GET', 'POST'])]
+    public function signup(UserPasswordHasherInterface $passwordHasher, Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -86,7 +85,7 @@ final class UserController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_my_account', [], Response::HTTP_SEE_OTHER);
         }
 
         $form->remove("role");
@@ -98,11 +97,27 @@ final class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
-    public function show(User $user): Response
+    #[Route('/myaccount', name: 'app_my_account', methods: ['GET'])]
+    public function show(UserRepository $userRepository): Response
     {
-        return $this->render('user/show.html.twig', [
+        $session=$this->requestStack->getSession();
+
+        if($session == null || $session->get("login") == null) {
+            return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        $login = $session->get("login");
+        $user = $userRepository->findOneBy(["login" => $login]);
+
+        if($user == null) {
+            return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('user/myaccount.html.twig', [
             'user' => $user,
+            'total_articles' => 42,
+            'total_views' => 1250,
+            'total_drafts' => 3,
         ]);
     }
 
@@ -115,7 +130,7 @@ final class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_my_account', [], Response::HTTP_SEE_OTHER);
         }
 
         # TODO: Remove these fields for non-admin users only
@@ -136,6 +151,6 @@ final class UserController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
     }
 }
