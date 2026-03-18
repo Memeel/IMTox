@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\ReportTag;
+use App\Entity\User;
 use App\Form\ReportTagType;
 use App\Repository\ReportTagRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,10 +28,10 @@ final class AdminController extends AbstractController
     public function users(UserRepository $userRepository): Response
 {
 
-    $users = $userRepository->findAll();
+    $users = $userRepository->getUsers();
 
     // Compter les utilisateurs actifs et verrouillés
-    $active = $userRepository->getNumberLockedUsers($users);
+    $active = $userRepository->getNumberActiveUsers($users);
     $locked = $userRepository->getNumberLockedUsers($users);
 
     // Rendre la vue avec les variables nécessaires
@@ -40,6 +41,36 @@ final class AdminController extends AbstractController
         'locked' => $locked,
     ]);
 }
+    #[Route('/admin/user/delete/{id}', name: 'app_admin_user_delete', methods: ['POST'])]
+    public function deleteUser(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->getPayload()->getString('_token'))) {
+            $entityManager->remove($user);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_admin_users', [], Response::HTTP_SEE_OTHER);
+    }
+    #[Route('/admin/user/lock/{id}', name: 'app_admin_user_lock', methods: ['POST'])]
+    public function lockUser(User $user, Request $request, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('lock'.$user->getId(), $request->request->get('_token'))) {
+            $user->setState("locked");
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('app_admin_users');
+}
+    #[Route('/admin/user/unlock/{id}', name: 'app_admin_user_unlock', methods: ['POST'])]
+    public function unlockUser(User $user, Request $request, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('unlock'.$user->getId(), $request->request->get('_token'))) {
+            $user->setState("active");
+            $em->flush();
+        }
+
+        return $this->redirectToRoute('app_admin_users');
+    }
 
     #[Route('/admin/tags', name: 'app_admin_tag_index')]
     public function tags(ReportTagRepository $reportTagRepository): Response
@@ -88,7 +119,7 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/admin/tags/{id}', name: 'app_admin_tag_delete', methods: ['POST'])]
-    public function delete(Request $request, ReportTag $tag, EntityManagerInterface $entityManager): Response
+    public function deleteTag(Request $request, ReportTag $tag, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$tag->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($tag);
