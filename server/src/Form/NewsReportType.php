@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\NewsReport;
+use App\Entity\ReportTag;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -19,7 +20,7 @@ class NewsReportType extends AbstractType
             ])
             ->add('tag', EntityType::class, [
                 'class' => ReportTag::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name',
                 'label' => 'Tag*',
             ])
             ->add('content', null, [

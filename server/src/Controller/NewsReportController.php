@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\NewsReport;
-use App\Form\NewsReport2Type;
+use App\Form\NewsReportType;
 use App\Repository\NewsReportRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use DateTimeImmutable;
@@ -27,7 +27,7 @@ final class NewsReportController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $newsReport = new NewsReport();
-        $form = $this->createForm(NewsReport2Type::class, $newsReport);
+        $form = $this->createForm(NewsReportType::class, $newsReport);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -55,7 +55,7 @@ final class NewsReportController extends AbstractController
     #[Route('/{id}/edit', name: 'app_news_report_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, NewsReport $newsReport, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(NewsReport2Type::class, $newsReport);
+        $form = $this->createForm(NewsReportType::class, $newsReport);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

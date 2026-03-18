@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\ReportTag;
-use App\Form\ReportTag1Type;
+use App\Form\ReportTagType;
 use App\Repository\ReportTagRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -26,7 +26,7 @@ final class ReportTagController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $reportTag = new ReportTag();
-        $form = $this->createForm(ReportTag1Type::class, $reportTag);
+        $form = $this->createForm(ReportTagType::class, $reportTag);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -53,7 +53,7 @@ final class ReportTagController extends AbstractController
     #[Route('/{id}/edit', name: 'app_report_tag_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, ReportTag $reportTag, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(ReportTag1Type::class, $reportTag);
+        $form = $this->createForm(ReportTagType::class, $reportTag);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
