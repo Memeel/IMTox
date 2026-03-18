@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Enums\UserRole;
+use App\Entity\Enums\UserState;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,23 +16,23 @@ class User
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 255, unique: true, nullable: false)]
     private ?string $login = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 255, unique: true, nullable: false)]
     private ?string $mail = null;
 
     #[ORM\Column(length: 255)]
     private ?string $fullname = null;
 
-    #[ORM\Column(length: 32)]
-    private ?string $role = null;
+    #[ORM\Column(length: 32, enumType: UserRole::class, nullable: false)]
+    private UserRole $role = UserRole::REPORTER;
 
-    #[ORM\Column(length: 32)]
-    private ?string $state = null;
+    #[ORM\Column(length: 32, enumType: UserState::class, nullable: false)]
+    private UserState $state = UserState::ACTIVE;
 
     public function getId(): ?int
     {
@@ -92,26 +94,33 @@ class User
         return $this;
     }
 
-    public function getRole(): ?string
+    public function getRole(): UserRole
     {
         return $this->role;
     }
 
-    public function setRole(string $role): static
+    public function setRole(?UserRole $role): static
     {
-        $this->role = $role;
-
+        if($role == NULL) {
+            $this->role = UserRole::REPORTER;
+        } else {
+            $this->role = $role;
+        }
         return $this;
     }
 
-    public function getState(): ?string
+    public function getState(): UserState
     {
         return $this->state;
     }
 
-    public function setState(string $state): static
+    public function setState(?UserState $state): static
     {
-        $this->state = $state;
+        if($state == NULL) {
+            $this->state = UserState::ACTIVE;
+        } else {
+            $this->state = $state;
+        }
 
         return $this;
     }
