@@ -38,6 +38,10 @@ class NewsReport
     #[ORM\JoinColumn(nullable: false)]
     private ?User $author = null;
 
+    #[ORM\ManyToOne(inversedBy: 'newsReports')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ReportTag $tag = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -147,6 +151,18 @@ class NewsReport
     public function setAuthor(?User $author): static
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function getTag(): ?ReportTag
+    {
+        return $this->tag;
+    }
+
+    public function setTag(?ReportTag $tag): static
+    {
+        $this->tag = $tag;
 
         return $this;
     }
