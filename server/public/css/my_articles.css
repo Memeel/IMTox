@@ -44,6 +44,10 @@
     align-items: center;
 }
 
+.meta {
+    margin-bottom: 10px;
+}
+
 .meta span {
     margin-right: 10px;
 }
@@ -99,4 +103,13 @@
 }
 .delete:hover {
     background-color: #c1270a;
+}
+
+.tag {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    margin-top: 0;
 }
