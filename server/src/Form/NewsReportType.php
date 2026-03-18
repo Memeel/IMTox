@@ -19,7 +19,7 @@ class NewsReportType extends AbstractType
             ])
             ->add('tag', EntityType::class, [
                 'class' => ReportTag::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name',
                 'label' => 'Tag*',
             ])
             ->add('content', null, [
