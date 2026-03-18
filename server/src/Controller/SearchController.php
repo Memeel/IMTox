@@ -14,35 +14,27 @@ final class SearchController extends AbstractController
     #[Route('/search', name: 'app_search')]
     public function search(Request $request, UserRepository $userRepository, NewsReportRepository $newsReportRepository): Response
     {
-        $search = $request->query->get('search');
-        $searchType = $request->query->get('search_type');
+        $search = $request->query->get('search', '');
+        $searchType = $request->query->get('search_type', '');
 
-        $qb_article = $newsReportRepository->createQueryBuilder('n');
+        $articles = [];
+        $reporters = [];
 
-        $qb_reporter = $userRepository->createQueryBuilder('u');
-
-        if ($searchType === 'reporters') {
-             $qb_reporter->andWhere('u.fullname LIKE :search AND u.role = :role')
-             ->setParameter('search', '%'.$search.'%')
-             ->setParameter('role', 'reporter');
+        if ($searchType === 'reporters' || $searchType === '') {
+            $qb = $userRepository->createQueryBuilder('u');
+            $qb->andWhere('u.fullname LIKE :search AND u.role = :role')
+                ->setParameter('search', '%'.$search.'%')
+                ->setParameter('role', 'reporter');
+            $reporters = $qb->getQuery()->getResult();
         }
 
-        if ($searchType === 'articles') {
-            $qb_article->andWhere('n.title LIKE :search OR n.content LIKE :search')
+        if ($searchType === 'articles' || $searchType === '') {
+            $qb = $newsReportRepository->createQueryBuilder('n');
+            $qb->andWhere('n.title LIKE :search OR n.content LIKE :search')
                 ->setParameter('search', '%'.$search.'%');
+            $articles = $qb->getQuery()->getResult();
         }
 
-        if ($searchType === '') {
-            $qb_article->andWhere('n.title LIKE :search OR n.content LIKE :search')
-            ->setParameter('search', '%'.$search.'%');
-
-            $qb_reporter->andWhere('u.fullname LIKE :search AND u.role = :role')
-            ->setParameter('search', '%'.$search.'%')
-            ->setParameter('role', 'reporter');
-        }
-
-        $articles = $qb_article->getQuery()->getResult();
-        $reporters = $qb_reporter->getQuery()->getResult();
         $articlesCount = count($articles);
         $reportersCount = count($reporters);
 
