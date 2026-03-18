@@ -1,0 +1,43 @@
+/* Container grid */
+.tags {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 2rem;
+}
+
+/* Card style */
+.tag {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px;
+    transition: box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* Card hover */
+.tag:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* Card title */
+.tag h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    flex: 1;
+}
+
+/* Actions on the right */
+.tag-actions {
+    display: flex;
+    margin: 8px;
+    gap: 8px;
+    flex-shrink: 0;
+}

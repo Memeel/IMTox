@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\NewsReport;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use DateTimeImmutable;
 
 /**
  * @extends ServiceEntityRepository<NewsReport>
@@ -16,28 +17,39 @@ class NewsReportRepository extends ServiceEntityRepository
         parent::__construct($registry, NewsReport::class);
     }
 
-    //    /**
-    //     * @return NewsReport[] Returns an array of NewsReport objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('n')
-    //            ->andWhere('n.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('n.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findArticle(string $state): array
+    {
+        $entityManager = $this->getEntityManager();
 
-    //    public function findOneBySomeField($value): ?NewsReport
-    //    {
-    //        return $this->createQueryBuilder('n')
-    //            ->andWhere('n.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        $query = $entityManager->createQuery(
+            'SELECT n
+            FROM App\Entity\NewsReport n
+            WHERE n.state = :state
+            ORDER BY n.updateAt DESC'
+        );
+        $query->setParameter('state', $state);
+
+        return $query->getResult();
+    }   
+
+    public function changeState(int $id, string $state): void
+    {
+        $entityManager = $this->getEntityManager();
+       
+        $query = $entityManager->createQuery(
+            'UPDATE App\Entity\NewsReport n
+            SET 
+                n.state = :state,
+                n.updateAt = :updateAt,
+                n.publishedAt = :publishedAt
+            WHERE n.id = :id'
+        );
+
+        $currentDateTime = new DateTimeImmutable();
+        $query->setParameter('state', $state);
+        $query->setParameter('updateAt', $currentDateTime);
+        $query->setParameter('publishedAt', $currentDateTime);
+        $query->setParameter('id', $id);
+        $query->execute();
+    }
 }

@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Management{% endblock %}
+
+{% block body %}
+<style> 
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; } 
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; } 
+    th { background: #f0f0f0; } button { margin-right: 5px; } 
+</style>
+
+<div class="user-management">
+    <h1>User Management</h1>
+
+    <form method="get" action="{{ path('app_admin_users') }}">
+        <div class="filters">
+            <input type="text" name="search" placeholder="Search by name or email" value="{{ app.request.query.get('search') }}">
+
+            <select name="role">
+                <option value="">All Roles</option>
+                <option value="admin" {% if app.request.query.get('role') == 'admin' %}selected{% endif %}>Admin</option>
+                <option value="reporter" {% if app.request.query.get('role') == 'reporter' %}selected{% endif %}>Reporter</option>
+            </select>
+
+            <select name="state">
+                <option value="">All States</option>
+                <option value="active" {% if app.request.query.get('state') == 'active' %}selected{% endif %}>Active</option>
+                <option value="locked" {% if app.request.query.get('state') == 'locked' %}selected{% endif %}>Locked</option>
+            </select>
+
+            <button type="submit">Filter</button>
+        </div>
+    </form>
+    {% if users|length > 0%}
+        <p>Number of Users: {{ users|length }} (Active: {{ active }}, Locked: {{ locked }})</p>
+        <table>
+            <tr> 
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.fullname }}</td>
+                <td>{{ user.mail }}</td>
+                <td>{{ user.role }}</td>
+                <td>{{ user.state }}</td>
+                <td>
+                    {% if user.state == 'active' %}
+                        {% include "admin/_user_lock_form.html.twig" %}   
+                    {% else %}
+                        {% include "admin/_user_unlock_form.html.twig" %}   
+                    {% endif %}
+
+                    {% include "admin/_user_delete_form.html.twig" %}   
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% else %}
+        <h3> No user found </h3>
+    {% endif %}
+
+</div>
+
+{% endblock %}

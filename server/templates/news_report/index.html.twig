@@ -15,7 +15,6 @@
                 <th>PublishedAt</th>
                 <th>UpdateAt</th>
                 <th>NumberOfViews</th>
-                <th>AuthorId</th>
                 <th>State</th>
                 <th>actions</th>
             </tr>
@@ -30,20 +29,19 @@
                 <td>{{ news_report.publishedAt ? news_report.publishedAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ news_report.updateAt ? news_report.updateAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ news_report.numberOfViews }}</td>
-                <td>{{ news_report.authorId }}</td>
                 <td>{{ news_report.state }}</td>
                 <td>
-                    <a href="{{ path('app_news_report_show', {'id': news_report.id}) }}">show</a>
-                    <a href="{{ path('app_news_report_edit', {'id': news_report.id}) }}">edit</a>
+                    <a href="{{ path('show_report', {'id': news_report.id}) }}">show</a>
+                    <a href="{{ path('edit_report', {'id': news_report.id}) }}">edit</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="10">no records found</td>
+                <td colspan="9">no records found</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_news_report_new') }}">Create new</a>
+    <a href="{{ path('create_report') }}">Create new</a>
 {% endblock %}

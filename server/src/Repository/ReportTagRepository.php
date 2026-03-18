@@ -16,6 +16,16 @@ class ReportTagRepository extends ServiceEntityRepository
         parent::__construct($registry, ReportTag::class);
     }
 
+    /**
+     * @return ReportTag[] Returns an array of ReportTag objects containing all tags
+     */
+    public function findAll(): array
+    {
+        return $this->createQueryBuilder("rt")
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return ReportTag[] Returns an array of ReportTag objects
     //     */
