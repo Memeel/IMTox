@@ -30,4 +30,17 @@ class NewsReportRepository extends ServiceEntityRepository
 
         return $query->getResult();
     }   
+
+    public function changeState(int $id, string $state): void
+    {
+        $entityManager = $this->getEntityManager();
+        $newsReport = $entityManager->getRepository(NewsReport::class)->find($id);
+
+        if (!$newsReport) {
+            throw new \Exception('No news report found for id ' . $id);
+        }
+
+        $newsReport->setState($state);
+        $entityManager->flush();
+    }
 }
