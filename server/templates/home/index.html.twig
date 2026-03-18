@@ -4,4 +4,14 @@
 
 {% block body %}
 <h1>Bienvenue sur IMTox !</h1>
+
+<div class="top-articles">
+    <h2>Top 5 des articles les plus lus</h2>
+    {% for article in topArticles %}
+        <div class="article">
+            <h3>{{ article.title }}</h3>
+            <p>{{ article.content }}</p>
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}

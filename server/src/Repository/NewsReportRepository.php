@@ -52,4 +52,12 @@ class NewsReportRepository extends ServiceEntityRepository
         $query->setParameter('id', $id);
         $query->execute();
     }
+
+    public function findTop5ArticlesForHome(): array {
+        return $this->createQueryBuilder('n')
+            ->orderBy('n.numberOfViews','DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+    }
 }
