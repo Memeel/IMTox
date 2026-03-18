@@ -26,9 +26,10 @@
         </div>
     </form>
 
-    {% if articlesCount > 0 %}
-        <h2>Articles ({{ articlesCount }})</h2>
-        <table>
+    {% if searchType == 'articles' or searchType == '' %}
+        {% if articlesCount > 0 %}
+            <h2>Articles ({{ articlesCount }})</h2>
+            <table>
             <tr> 
                 <th>Title</th>
                 <th>Author</th>
@@ -38,16 +39,18 @@
             {% for article in articles %}
             <tr>
                 <td><a href="{{ path('show_report', {'id': article.id}) }}">{{ article.title }}</a></td>
-                <td>{{ article.author.username ?? 'Unknown' }}</td>
+                <td>{{ article.author.fullName ?? 'Unknown' }}</td>
                 <td>{{ article.createdAt ? article.createdAt|date('d/m/Y') : '' }}</td>
                 <td>{{ article.numberOfViews ?? 0 }}</td>
             </tr>
             {% endfor %}
         </table>
-    {% else %}
-        <p>No articles found.</p>
+        {% else %}
+            <p>No articles found.</p>
+        {% endif %}
     {% endif %}
 
+    {% if searchType == 'reporters' or searchType == '' %}
     {% if reportersCount > 0 %}
         <h2>Reporters ({{ reportersCount }})</h2>
         <table>
@@ -64,6 +67,7 @@
         </table>
     {% else %}
         <p>No reporters found.</p>
+    {% endif %}
     {% endif %}
 
 {% endblock %}
