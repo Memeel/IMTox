@@ -1,4 +1,4 @@
-<!-- Auteurs: Sadok LAJMI, Mélina WANG -->
+{# Auteurs: Sadok LAJMI, Mélina WANG #}
 
 {% extends 'base.html.twig' %}
 
@@ -9,24 +9,33 @@
 
     {# Back link #}
     <div>
-        <a href="{{ path('show_drafts') }}">← Back to Articles</a>
+        {% if news_report.state == 'draft'  %}
+            <a href="{{ path('show_drafts') }}">← Back to Drafts</a>
+        {% else %}
+            <a href="{{ path('show_published') }}">← Back to Articles</a>
+        {% endif %}
     </div>
 
-    {# Category (optional if you have one) #}
-    {% if news_report.category is defined %}
-        <div class="category">
-            {{ news_report.category }}
-        </div>
-    {% endif %}
+    {# Report Tag #}
+    
+    <div class="tag">
+        {{ news_report.tag.name }}
+    </div>
 
     {# Title #}
     <h1>{{ news_report.title }}</h1>
 
-    {# Meta info #}
-    <div class="meta">
-        <span>By {{ news_report.author.fullName ?? 'Unknown' }}</span>
-        <span>• Published {{ news_report.publishedAt ? news_report.publishedAt|date('F j, Y') : '' }}</span>
-        <span>• Last updated {{ news_report.updateAt ? news_report.updateAt|date('F j, Y') : '' }}</span>
+    {# Meta info and views #}
+    <div class="meta display-flex justify-content: space-between">
+        <div>
+            <span>By {{ news_report.author.fullName ?? 'Unknown' }}</span>
+            <span>• Published {{ news_report.publishedAt ? news_report.publishedAt|date('F j, Y') : '' }}</span>
+            <span>• Last updated {{ news_report.updateAt ? news_report.updateAt|date('F j, Y') : '' }}</span>
+        </div>
+
+        <div>
+            <span>Views: {{ news_report.numberOfViews }}</span>
+        </div>
     </div>
 
     {# Content #}

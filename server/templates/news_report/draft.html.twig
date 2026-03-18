@@ -1,5 +1,4 @@
-<!-- Auteurs: Sadok LAJMI, Mélina WANG -->
-
+{# Auteurs: Sadok LAJMI, Mélina WANG #}
 {% extends 'base.html.twig' %}
 
 {% block title %}NewsReport index{% endblock %}
@@ -8,40 +7,27 @@
     <h1>My Articles</h1>
     <button class="btn"><a href="{{ path('create_report') }}">Create Article</a></button>
 
-    {% include "articles_header.html.twig" %}
+    {% include "/news_report/articles_header.html.twig" %}
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Author</th>
-                <th>Published At</th>
-                <th>Updated At</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div>
         {% for news_report in draft_report %}
-            <tr>
-                <td>{{ news_report.id }}</td>
-                <td>{{ news_report.title }}</td>
-                <td>{{ news_report.category }}</td>
-                <td>{{ news_report.author.fullName ?? 'Unknown' }}</td>
-                <td>{{ news_report.publishedAt ? news_report.publishedAt|date('Y-m-d H:i') : '' }}</td>
-                <td>{{ news_report.updateAt ? news_report.updateAt|date('Y-m-d H:i') : '' }}</td>
-                <td>
-                    <a href="{{ path('show_report', {'id': news_report.id}) }}">Show</a>
-                    <a href="{{ path('edit_report', {'id': news_report.id}) }}">Edit</a>
+            <div>
+                    <h3>{{ news_report.title }}</h3>
+                
+                    {{ news_report.content|length > 150 ? news_report.content|slice(0, 150) ~ '...' : news_report.content }}
+                    <span>{{ news_report.author.username ?? 'Unknown' }}</span>
+                    <span>{{ news_report.createdAt ? news_report.createdAt|date('d/m/Y') : '' }}</span>
+                    <span>{{ news_report.numberOfViews ?? 0 }} views</span>
+                    <button class="btn-small"><a href="{{ path('show_report', {'id': news_report.id}) }}">View</a></button>
+                    <button class="btn-small"><a href="{{ path('edit_report', {'id': news_report.id}) }}">Modify</a></button>
                     {{ include('news_report/_delete_form.html.twig') }}
-                </td>
-            </tr>
+            </div>
         {% else %}
-            <tr><td colspan="7">No drafts found.</td></tr>
+            <p>
+            No drafts found. <a href="{{ path('create_report') }}">Create your first article</a>
+            </p>
         {% endfor %}
-        </tbody>
-    </table>
+    </div>
 
 
 {% endblock %}

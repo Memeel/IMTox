@@ -15,8 +15,15 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/account/article')]
 final class NewsReportController extends AbstractController
 {
+    #[Route('/', name: 'app_news_report_index', methods: ['GET'])]
+    public function list(NewsReportRepository $newsReportRepository): Response
+    {        return $this->render('news_report/index.html.twig', [
+            'news_reports' => $newsReportRepository->findAll(),
+        ]);
+    }
+
     #[Route('/draft', name: 'show_drafts', methods: ['GET'])]
-    public function index(NewsReportRepository $newsReportRepository): Response
+    public function showDrafts(NewsReportRepository $newsReportRepository): Response
     {
         return $this->render('news_report/draft.html.twig', [
             'draft_report' => $newsReportRepository->findArticle('draft')
@@ -43,7 +50,8 @@ final class NewsReportController extends AbstractController
             $entityManager->persist($newsReport);
             $entityManager->flush();
 
-            return $this->redirectToRoute('show_drafts', [], Response::HTTP_SEE_OTHER);
+            $route = $newsReport->getState() === 'published' ? 'show_published' : 'show_drafts';
+            return $this->redirectToRoute($route, [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('news_report/new.html.twig', [
@@ -53,8 +61,18 @@ final class NewsReportController extends AbstractController
     }
 
     #[Route('/{id}/show', name: 'show_report', methods: ['GET'])]
-    public function show(NewsReport $newsReport): Response
+    public function show(Request $request, NewsReport $newsReport, EntityManagerInterface $entityManager): Response
     {
+        $session = $request->getSession();
+        $viewed = $session->get('viewed_articles', []);
+
+        if (!in_array($newsReport->getId(), $viewed)) {
+            $newsReport->setNumberOfViews($newsReport->getNumberOfViews() + 1);
+            $entityManager->flush();
+
+            $viewed[] = $newsReport->getId();
+            $session->set('viewed_articles', $viewed);
+        }
         return $this->render('news_report/show.html.twig', [
             'news_report' => $newsReport,
         ]);

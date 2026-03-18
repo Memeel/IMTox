@@ -24,7 +24,7 @@ class NewsReportRepository extends ServiceEntityRepository
             'SELECT n
             FROM App\Entity\NewsReport n
             WHERE n.state = :state
-            ORDER BY n.updatedAt DESC'
+            ORDER BY n.updateAt DESC'
         );
         $query->setParameter('state', $state);
 
