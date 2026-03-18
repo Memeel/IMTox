@@ -23,6 +23,21 @@ final class UserController extends AbstractController
         ]);
     }
 
+    #[Route('/login', name: 'app_user_login', methods: ['GET', 'POST'])]
+    public function login(Request $request, EntityManagerInterface $entityManager){
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+        $form->remove("role");
+        $form->remove("state");
+        if ($form->isSubmitted() && $form->isValid()) {
+            
+        }
+        return $this->render('user/login.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
     public function new(UserPasswordHasherInterface $passwordHasher, Request $request, EntityManagerInterface $entityManager): Response
     {
