@@ -20,12 +20,11 @@
                 </div>
 
                 <div class="meta"> 
-                    <span>{{ news_report.author.username ?? 'Unknown' }}</span>
-                    <span>{{ news_report.createdAt ? news_report.createdAt|date('d/m/Y') : '' }}</span>
-                    <span>{{ news_report.numberOfViews ?? 0 }} views</span>
+                    <span>created on: {{ news_report.createdAt ? news_report.createdAt|date('d/m/Y') : '' }}</span>
                 </div>
 
                 {{ news_report.content|length > 150 ? news_report.content|slice(0, 150) ~ '...' : news_report.content }}
+                
                 {{ include('news_report/_delete_form.html.twig') }}
             </div>
         {% else %}

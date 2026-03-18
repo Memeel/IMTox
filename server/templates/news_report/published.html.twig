@@ -20,9 +20,8 @@
                 </div>
 
                 <div class="meta"> 
-                    <span>{{ news_report.author.username ?? 'Unknown' }}</span>
-                    <span>{{ news_report.createdAt ? news_report.createdAt|date('d/m/Y') : '' }}</span>
-                    <span>{{ news_report.numberOfViews ?? 0 }} views</span>
+                    <span>published on: {{ news_report.publishedAt ? news_report.publishedAt|date('d/m/Y') : '' }}</span>
+                    <span> {{ news_report.numberOfViews ?? 0 }} views</span>
                 </div>
 
                 {{ news_report.content|length > 150 ? news_report.content|slice(0, 150) ~ '...' : news_report.content }}
