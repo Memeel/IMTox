@@ -16,6 +16,15 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    public function getNumberActiveUsers($users): int
+    {
+        return count(array_filter($users, fn($user) => $user->getState() === 'active'));
+    }
+    public function getNumberLockedUsers($users): int
+    {
+        return count(array_filter($users, fn($user) => $user->getState() === 'locked'));
+    }
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */
