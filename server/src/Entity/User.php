@@ -6,10 +6,16 @@ use App\Entity\Enums\UserRole;
 use App\Entity\Enums\UserState;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherAwareInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User
+class User implements
+    UserInterface,
+    PasswordAuthenticatedUserInterface,
+    PasswordHasherAwareInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -33,6 +39,18 @@ class User
 
     #[ORM\Column(length: 32, enumType: UserState::class, nullable: false)]
     private UserState $state = UserState::ACTIVE;
+
+    public function getRoles(): array {
+        return [$this->role->value];
+    }
+
+    public function getUserIdentifier(): string {
+        return $this->login;
+    }
+
+    public function getPasswordHasherName(): ?string {
+        return null;
+    }
 
     public function getId(): ?int
     {
