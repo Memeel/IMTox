@@ -20,6 +20,7 @@ final class UserController extends AbstractController
         private RequestStack $requestStack,
     ) {
     }
+
     #[Route(name: 'app_my_account', methods: ['GET'])]
     public function index(UserRepository $userRepository): Response
     {
@@ -97,20 +98,28 @@ final class UserController extends AbstractController
         ]);
     }
 
+    #[Route('/signout', name: 'app_user_signout', methods: ['GET', 'POST'])]
+    public function signout(): Response
+    {
+        $session=$this->requestStack->getSession();
+        $session->remove("login");
+        return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+    }
+
     #[Route('/myaccount', name: 'app_my_account', methods: ['GET'])]
     public function show(UserRepository $userRepository): Response
     {
         $session=$this->requestStack->getSession();
 
         if($session == null || $session->get("login") == null) {
-            return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_user_signup', [], Response::HTTP_SEE_OTHER);
         }
 
         $login = $session->get("login");
         $user = $userRepository->findOneBy(["login" => $login]);
 
         if($user == null) {
-            return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_user_signup', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('user/myaccount.html.twig', [
