@@ -31,11 +31,12 @@ class NewsReport
     #[ORM\Column]
     private ?int $numberOfViews = null;
 
-    #[ORM\Column]
-    private ?int $authorId = null;
-
     #[ORM\Column(length: 255)]
     private ?string $state = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $author = null;
 
     public function getId(): ?int
     {
@@ -134,6 +135,18 @@ class NewsReport
     public function setState(string $state): static
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): static
+    {
+        $this->author = $author;
 
         return $this;
     }
