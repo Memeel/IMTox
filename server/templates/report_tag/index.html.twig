@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ReportTag index{% endblock %}
+
+{% block body %}
+    <h1>ReportTag index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for report_tag in report_tags %}
+            <tr>
+                <td>{{ report_tag.id }}</td>
+                <td>{{ report_tag.name }}</td>
+                <td>
+                    <a href="{{ path('app_report_tag_show', {'id': report_tag.id}) }}">show</a>
+                    <a href="{{ path('app_report_tag_edit', {'id': report_tag.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_report_tag_new') }}">Create new</a>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}NewsReport{% endblock %}
+
+{% block body %}
+    <h1>NewsReport</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ news_report.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ news_report.title }}</td>
+            </tr>
+            <tr>
+                <th>Content</th>
+                <td>{{ news_report.content }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ news_report.createdAt ? news_report.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>PublishedAt</th>
+                <td>{{ news_report.publishedAt ? news_report.publishedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdateAt</th>
+                <td>{{ news_report.updateAt ? news_report.updateAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>NumberOfViews</th>
+                <td>{{ news_report.numberOfViews }}</td>
+            </tr>
+            <tr>
+                <th>AuthorId</th>
+                <td>{{ news_report.authorId }}</td>
+            </tr>
+            <tr>
+                <th>State</th>
+                <td>{{ news_report.state }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_news_report_index') }}">back to list</a>
+
+    <a href="{{ path('app_news_report_edit', {'id': news_report.id}) }}">edit</a>
+
+    {{ include('news_report/_delete_form.html.twig') }}
+{% endblock %}

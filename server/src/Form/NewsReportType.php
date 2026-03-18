@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Form;
+
+use App\Entity\NewsReport;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class NewsReportType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('title')
+            ->add('content')
+            ->add('createdAt', null, [
+                'widget' => 'single_text',
+            ])
+            ->add('publishedAt', null, [
+                'widget' => 'single_text',
+            ])
+            ->add('updateAt', null, [
+                'widget' => 'single_text',
+            ])
+            ->add('numberOfViews')
+            ->add('authorId')
+            ->add('state')
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => NewsReport::class,
+        ]);
+    }
+}
