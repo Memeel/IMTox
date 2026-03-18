@@ -22,8 +22,9 @@ final class SearchController extends AbstractController
         $qb_reporter = $userRepository->createQueryBuilder('u');
 
         if ($searchType === 'reporters') {
-             $qb_reporter->andWhere('u.fullname LIKE :search AND u.role = reporter')
-             ->setParameter('search', '%'.$search.'%');
+             $qb_reporter->andWhere('u.fullname LIKE :search AND u.role = :role')
+             ->setParameter('search', '%'.$search.'%')
+             ->setParameter('role', 'reporter');
         }
 
         if ($searchType === 'articles') {
@@ -35,8 +36,9 @@ final class SearchController extends AbstractController
             $qb_article->andWhere('n.title LIKE :search OR n.content LIKE :search')
             ->setParameter('search', '%'.$search.'%');
 
-            $qb_reporter->andWhere('u.fullname LIKE :search AND u.role = reporter')
-            ->setParameter('search', '%'.$search.'%');
+            $qb_reporter->andWhere('u.fullname LIKE :search AND u.role = :role')
+            ->setParameter('search', '%'.$search.'%')
+            ->setParameter('role', 'reporter');
         }
 
         $articles = $qb_article->getQuery()->getResult();
