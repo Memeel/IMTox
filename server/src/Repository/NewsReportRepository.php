@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\NewsReport;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use DateTimeImmutable;
 
 /**
  * @extends ServiceEntityRepository<NewsReport>
@@ -37,10 +38,17 @@ class NewsReportRepository extends ServiceEntityRepository
        
         $query = $entityManager->createQuery(
             'UPDATE App\Entity\NewsReport n
-            SET n.state = :state
+            SET 
+                n.state = :state,
+                n.updateAt = :updateAt,
+                n.publishedAt = :publishedAt
             WHERE n.id = :id'
         );
+
+        $currentDateTime = new DateTimeImmutable();
         $query->setParameter('state', $state);
+        $query->setParameter('updateAt', $currentDateTime);
+        $query->setParameter('publishedAt', $currentDateTime);
         $query->setParameter('id', $id);
         $query->execute();
     }

@@ -19,8 +19,7 @@
                     <span>{{ news_report.numberOfViews ?? 0 }} views</span>
                     <button class="btn-small"><a href="{{ path('show_report', {'id': news_report.id}) }}">View</a></button>
                     <button class="btn-small"><a href="{{ path('edit_report', {'id': news_report.id}) }}">Modify</a></button>
-                    <button class="btn-small" onclick="changeState({{ news_report.id }}, 'draft')">Unpublish</button>
-                    {{ include('news_report/_delete_form.html.twig') }}
+                    <button class="btn-small"><a href="{{ path('change_state', {'id': news_report.id, 'state': 'draft'}) }}">Unpublish</a></button>
             </div>
         {% else %}
             <p>

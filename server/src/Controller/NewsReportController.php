@@ -97,6 +97,16 @@ final class NewsReportController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/{state}', name: 'change_state', methods: ['GET'])]
+    public function changeState(string $state, NewsReport $newsReport, NewsReportRepository $newsReportRepository, EntityManagerInterface $entityManager): Response
+    {        
+        $newsReportRepository->changeState($newsReport->getId(), $state);
+        $entityManager->flush();
+         
+        $route = $newsReport->getState() === 'draft' ? 'show_published' : 'show_drafts';
+        return $this->redirectToRoute($route, [], Response::HTTP_SEE_OTHER);
+    }
+
     #[Route('/{id}', name: 'delete_report', methods: ['POST'])]
     public function delete(Request $request, NewsReport $newsReport, EntityManagerInterface $entityManager): Response
     {

@@ -31,7 +31,7 @@
                 <td>{{ news_report.numberOfViews }}</td>
                 <td>{{ news_report.state }}</td>
                 <td>
-                    <a href="{{ path('app_news_report_show', {'id': news_report.id}) }}">show</a>
+                    <a href="{{ path('show_report', {'id': news_report.id}) }}">show</a>
                     <a href="{{ path('edit_report', {'id': news_report.id}) }}">edit</a>
                 </td>
             </tr>
