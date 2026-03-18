@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Management{% endblock %}
+
+{% block body %}
+<style>
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f0f0f0; }
+    button { margin-right: 5px; } 
+</style>
+
+<div class>
+    <h1>User Management</h1>
+    <p>Total Users: {{ users|length }} (Active: {{ active }}, Locked: {{ locked }})</p>
+
+    <table>
+        <tr> 
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.fullname }}</td>
+            <td>{{ user.mail }}</td>
+            <td>{{ user.role }}</td>
+            <td>{{ user.state }}</td>
+            <td>
+                {% if user.state == 'active' %}
+                    {% include "admin/_user_lock_form.html.twig" %}   
+                {% else %}
+                    {% include "admin/_user_unlock_form.html.twig" %}   
+                {% endif %}
+
+                {% include "admin/_user_delete_form.html.twig" %}   
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
