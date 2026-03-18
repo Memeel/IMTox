@@ -19,28 +19,26 @@ final class AdminController extends AbstractController
     #[Route('/admin', name: 'app_admin')]
     public function index(): Response
     {
-        return $this->render('admin/index.html.twig', [
-            'controller_name' => 'AdminController',
-        ]);
+        return $this->redirectToRoute('app_admin_users');
     }
 
     #[Route('/admin/users', name: 'app_admin_users')]
     public function users(UserRepository $userRepository): Response
-{
+    {
+        $users = $userRepository->getUsers();
 
-    $users = $userRepository->getUsers();
+        // Compter les utilisateurs actifs et verrouillés
+        $active = $userRepository->getNumberActiveUsers($users);
+        $locked = $userRepository->getNumberLockedUsers($users);
 
-    // Compter les utilisateurs actifs et verrouillés
-    $active = $userRepository->getNumberActiveUsers($users);
-    $locked = $userRepository->getNumberLockedUsers($users);
+        // Rendre la vue avec les variables nécessaires
+        return $this->render('admin/users.html.twig', [
+            'users' => $users,
+            'active'=> $active,
+            'locked' => $locked,
+        ]);
+    }
 
-    // Rendre la vue avec les variables nécessaires
-    return $this->render('admin/users.html.twig', [
-        'users' => $users,
-        'active'=> $active,
-        'locked' => $locked,
-    ]);
-}
     #[Route('/admin/user/delete/{id}', name: 'app_admin_user_delete', methods: ['POST'])]
     public function deleteUser(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
@@ -60,7 +58,8 @@ final class AdminController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_users');
-}
+    }
+    
     #[Route('/admin/user/unlock/{id}', name: 'app_admin_user_unlock', methods: ['POST'])]
     public function unlockUser(User $user, Request $request, EntityManagerInterface $em): Response
     {
