@@ -6,6 +6,7 @@ use App\Entity\NewsReport;
 use App\Form\NewsReport2Type;
 use App\Repository\NewsReportRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +31,7 @@ final class NewsReportController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->applySaveAction($newsReport, $request->request->getString('save_action'));
             $entityManager->persist($newsReport);
             $entityManager->flush();
 
@@ -57,6 +59,7 @@ final class NewsReportController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->applySaveAction($newsReport, $request->request->getString('save_action'));
             $entityManager->flush();
 
             return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
@@ -77,5 +80,32 @@ final class NewsReportController extends AbstractController
         }
 
         return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function applySaveAction(NewsReport $newsReport, string $saveAction): void
+    {
+        $now = new DateTimeImmutable();
+
+        if ($newsReport->getCreatedAt() === null) {
+            $newsReport->setCreatedAt($now);
+        }
+
+        if ($newsReport->getNumberOfViews() === null) {
+            $newsReport->setNumberOfViews(0);
+        }
+
+        $newsReport->setUpdateAt($now);
+
+        if ($saveAction === 'publish') {
+            $newsReport->setState('published');
+            $newsReport->setPublishedAt($now);
+            return;
+        }
+
+        $newsReport->setState('draft');
+
+        if ($newsReport->getPublishedAt() === null) {
+            $newsReport->setPublishedAt($now);
+        }
     }
 }

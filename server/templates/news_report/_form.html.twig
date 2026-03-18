@@ -1,4 +1,7 @@
 {{ form_start(form) }}
     {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+    <button class="btn" href={{ path('my_articles') }} onclick= "return confirm('Are you sure you want to cancel?');">Cancel</button>
+    <button class="btn" type="submit" name="save_action" value="draft"><a href={{ path('my_articles') }}>Save as Draft</a></button>
+    <button class="btn" type="submit" name="save_action" value="publish">Publish</button>
+    <button class="btn" href={{ path('app_news_report_read') }}>Visualize</button>
 {{ form_end(form) }}
