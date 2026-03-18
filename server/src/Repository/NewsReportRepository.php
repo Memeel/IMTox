@@ -16,33 +16,18 @@ class NewsReportRepository extends ServiceEntityRepository
         parent::__construct($registry, NewsReport::class);
     }
 
-    public function findDrafts(): array
+    public function findArticle(string $state): array
     {
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(
             'SELECT n
             FROM App\Entity\NewsReport n
-            WHERE n.state = draft
+            WHERE n.state = :state
             ORDER BY n.updatedAt DESC'
         );
+        $query->setParameter('state', $state);
 
         return $query->getResult();
-    }
-
-    public function findPublished(): array
-    {
-        $entityManager = $this->getEntityManager();
-
-        $query = $entityManager->createQuery(
-            'SELECT n
-            FROM App\Entity\NewsReport n
-            WHERE n.state = published
-            ORDER BY n.updatedAt DESC'
-        );
-
-        return $query->getResult();
-    }
-
-   
+    }   
 }

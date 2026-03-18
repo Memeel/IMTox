@@ -19,7 +19,7 @@ final class NewsReportController extends AbstractController
     public function index(NewsReportRepository $newsReportRepository): Response
     {
         return $this->render('news_report/draft.html.twig', [
-            'draft_report' => $newsReportRepository->findDrafts()
+            'draft_report' => $newsReportRepository->findArticle('draft')
         ]);
     }
 
@@ -27,7 +27,7 @@ final class NewsReportController extends AbstractController
     public function showPublished(NewsReportRepository $newsReportRepository): Response
     {
         return $this->render('news_report/published.html.twig', [
-            'published_report' => $newsReportRepository->findPublished()
+            'published_report' => $newsReportRepository->findArticle('published')
         ]);
     }
 
