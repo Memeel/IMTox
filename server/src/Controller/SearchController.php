@@ -46,7 +46,7 @@ final class SearchController extends AbstractController
         $articlesCount = count($articles);
         $reportersCount = count($reporters);
 
-        return $this->render('admin/users.html.twig', [
+        return $this->render('search/search.html.twig', [
             'articles' => $articles,
             'reporters' => $reporters,
             'articlesCount' => $articlesCount,
