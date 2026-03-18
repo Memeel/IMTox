@@ -23,22 +23,39 @@ final class AdminController extends AbstractController
     }
 
     #[Route('/admin/users', name: 'app_admin_users')]
-    public function users(UserRepository $userRepository): Response
+    public function listUsers(Request $request, UserRepository $userRepo)
     {
-        $users = $userRepository->getUsers();
+        $search = $request->query->get('search');
+        $role   = $request->query->get('role');
+        $state  = $request->query->get('state');
 
-        // Compter les utilisateurs actifs et verrouillés
-        $active = $userRepository->getNumberActiveUsers($users);
-        $locked = $userRepository->getNumberLockedUsers($users);
+        $qb = $userRepo->createQueryBuilder('u');
 
-        // Rendre la vue avec les variables nécessaires
+        if ($search) {
+            $qb->andWhere('u.fullname LIKE :search OR u.mail LIKE :search')
+            ->setParameter('search', '%'.$search.'%');
+        }
+
+        if ($role) {
+            $qb->andWhere('u.role = :role')
+            ->setParameter('role', $role);
+        }
+
+        if ($state) {
+            $qb->andWhere('u.state = :state')
+            ->setParameter('state', $state);
+        }
+
+        $users = $qb->getQuery()->getResult();
+        $active = $userRepo->getNumberActiveUsers($users);
+        $locked = $userRepo->getNumberLockedUsers($users);
+
         return $this->render('admin/users.html.twig', [
-            'users' => $users,
-            'active'=> $active,
+            'users'  => $users,
+            'active' => $active,
             'locked' => $locked,
         ]);
     }
-
     #[Route('/admin/user/delete/{id}', name: 'app_admin_user_delete', methods: ['POST'])]
     public function deleteUser(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {

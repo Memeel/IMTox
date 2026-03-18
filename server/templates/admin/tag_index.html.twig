@@ -5,14 +5,17 @@
 {% block body %}
 <h1>Manage Tags</h1>
 
-<a href="{{ path('app_admin_tag_add') }}">+ Add New Tag</a>
+<a class="btn-primary" href="{{ path('app_admin_tag_add') }}">+ Add New Tag</a>
 
 <div class="tags">
     {% for tag in tags %}
         <div class="tag">
             <h2>{{ tag.name }}</h2>
-            <a href="{{ path('app_admin_tag_edit', {'id': tag.id}) }}">Edit</a>
-            {% include "admin/_tag_delete_form.html.twig" %}   
+
+            <div class="tag-actions">
+                {% include "admin/_tag_edit_form.html.twig" %}
+                {% include "admin/_tag_delete_form.html.twig" %}
+            </div>
         </div>
     {% endfor %}
 </div>

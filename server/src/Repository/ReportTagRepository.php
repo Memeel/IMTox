@@ -21,7 +21,7 @@ class ReportTagRepository extends ServiceEntityRepository
      */
     public function findAll(): array
     {
-        return $this->createQueryBuilder("r")
+        return $this->createQueryBuilder("rt")
             ->getQuery()
             ->getResult();
     }
