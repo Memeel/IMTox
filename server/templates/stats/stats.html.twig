@@ -3,22 +3,22 @@
 {% block title %}Statistics{% endblock %}
 
 {% block body %}
-<script src="/lib/phpchart/js/jquery.min.js"></script>
-<script src="/lib/phpchart/js/jquery.jqplot.min.js"></script>
-<script src="/lib/phpchart/js/plugins/jqplot.barRenderer.min.js"></script>
-<script src="/lib/phpchart/js/plugins/jqplot.categoryAxisRenderer.min.js"></script>
 
-<link rel="stylesheet" href="/lib/phpchart/css/jquery.jqplot.css">
 <style> 
-    .stats-container {
-        display: flex;
+    .stats-container { 
+        display: flex; 
         gap: 20px; 
-        margin-top: 20px;
+        margin-top: 20px; 
+    }
+
+    .stats-container > div { 
+        flex: 1;
+        min-width: 0;
     }
 
     table { 
         border-collapse: collapse; 
-        width: 50%; 
+        width: 100%;
     }
 
     th, td { 
@@ -27,91 +27,89 @@
         text-align: left; 
     }
 
-    th { background: #f0f0f0; }
+    th { 
+        background: #f0f0f0; 
+    }
+
+    canvas { 
+        max-width: 100%;
+        margin-top: 20px; 
+    }
 </style>
 
 <div>
     <h1>Statistics Dashboard</h1>
 
     <div class="stats-container">
-        <!-- Top 5 Articles -->
         <div>
+            <h2>Top Articles</h2>
             <table>
+                <tr><th>Rank</th><th>Title</th><th>Author</th><th>Total Views</th></tr>
+                {% for article in articles %}
                 <tr>
-                    <th>Rank</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Total Views</th>
-                </tr>
-                {% for i in 0..articles|length - 1 %}
-                <tr>
-                    <td>{{ i + 1 }}</td>
-                    <td>{{ articles[i].title }}</td>
-                    <td>{{ articles[i].author.fullname }}</td>
-                    <td>{{ articles[i].numberOfViews }}</td>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ article.title }}</td>
+                    <td>{{ article.author.fullname }}</td>
+                    <td>{{ article.numberOfViews }}</td>
                 </tr>
                 {% endfor %}
             </table>
-            <div id="articleChart" style="height:300px;"></div>
+            <canvas id="articleChart"></canvas>
         </div>
 
-        <!-- Top 5 Reporters -->
         <div>
+            <h2>Top Reporters</h2>
             <table>
-                <tr>
-                    <th>Rank</th>
-                    <th>Reporter</th>
-                    <th>Articles</th>
-                    <th>Total Views</th>
-                </tr>
+                <tr><th>Rank</th><th>Reporter</th><th>Articles</th><th>Total Views</th></tr>
                 {% for reporter in reporters %}
                 <tr>
                     <td>{{ loop.index }}</td>
-                    <td>{{ reporter['fullname'] }}</td>
-                    <td>{{ reporter['numberOfArticles'] }}</td>
-                    <td>{{ reporter['totalViews'] }}</td>
+                    <td>{{ reporter.fullname }}</td>
+                    <td>{{ reporter.numberOfArticles }}</td>
+                    <td>{{ reporter.totalViews }}</td>
                 </tr>
                 {% endfor %}
             </table>
-            <div id="reporterChart" style="height:300px;"></div>
+            <canvas id="reporterChart"></canvas>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    $(document).ready(function () {
-        // Articles chart
-        var articleData = {{ articleViews|raw }};
-        var articleTicks = {{ articleTitles|raw }};
+    // Articles Chart
+    const articleCtx = document.getElementById('articleChart').getContext('2d');
+    const articleChart = new Chart(articleCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ articles|map(a => a.title)|json_encode|raw }},
+            datasets: [{
+                label: 'Total Views',
+                data: {{ articles|map(a => a.numberOfViews)|json_encode|raw }},
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+    });
 
-        var articlePlot = $.jqplot('articleChart', [articleData], {
-            title: 'Top Articles by Views',
-            seriesDefaults: {
-                renderer: $.jqplot.BarRenderer
-            },
-            axes: {
-                xaxis: {
-                    renderer: $.jqplot.CategoryAxisRenderer,
-                    ticks: articleTicks
-                }
-            }
-        });
-
-        // Reporters chart
-        var reporterData = {{ reporterViews|raw }};
-        var reporterTicks = {{ reporterNames|raw }};
-
-        var reporterPlot = $.jqplot('reporterChart', [reporterData], {
-            title: 'Top Reporters by Views',
-            seriesDefaults: {
-                renderer: $.jqplot.BarRenderer
-            },
-            axes: {
-                xaxis: {
-                    renderer: $.jqplot.CategoryAxisRenderer,
-                    ticks: reporterTicks
-                }
-            }
-        });
+    // Reporters Chart
+    const reporterCtx = document.getElementById('reporterChart').getContext('2d');
+    const reporterChart = new Chart(reporterCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ reporters|map(r => r.fullname)|json_encode|raw }},
+            datasets: [{
+                label: 'Total Views',
+                data: {{ reporters|map(r => r.totalViews)|json_encode|raw }},
+                backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
     });
 </script>
+
 {% endblock %}
