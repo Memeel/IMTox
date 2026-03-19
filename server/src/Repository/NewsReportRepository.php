@@ -16,6 +16,29 @@ class NewsReportRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, NewsReport::class);
     }
+    public function getTopFiveArticles(): array
+    {
+        $qb = $this->createQueryBuilder('news_report');
+
+        $qb->select('news_report')
+        ->orderBy('news_report.numberOfViews', 'DESC')
+        ->setMaxResults(5);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function getTopFiveReporters(): array
+    {
+        $qb = $this->createQueryBuilder('nr');
+
+        $qb->select('u.id, u.fullname, COUNT(nr.id) as numberOfArticles, SUM(nr.numberOfViews) as totalViews')
+        ->join('nr.author', 'u')
+        ->groupBy('u.id')
+        ->orderBy('totalViews', 'DESC')
+        ->setMaxResults(5);
+
+        return $qb->getQuery()->getResult();
+    }
 
     public function findArticle(string $state): array
     {
