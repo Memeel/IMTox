@@ -19,7 +19,7 @@ final class HomeController extends AbstractController
     public function home(NewsReportRepository $newsReportRepository): Response
     {
         return $this->render('home/index.html.twig', [
-            'topArticles'=> $newsReportRepository->findTop5ArticlesForHome(),
+            'articles'=> $newsReportRepository->find5LatestArticlesForHome(),
         ]);
     }
 }

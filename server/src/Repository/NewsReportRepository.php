@@ -53,9 +53,10 @@ class NewsReportRepository extends ServiceEntityRepository
         $query->execute();
     }
 
-    public function findTop5ArticlesForHome(): array {
+    public function find5LatestArticlesForHome(): array {
         return $this->createQueryBuilder('n')
-            ->orderBy('n.numberOfViews','DESC')
+            ->where("n.state = 'published'")
+            ->orderBy('n.createdAt','DESC')
             ->setMaxResults(5)
             ->getQuery()
             ->getResult();

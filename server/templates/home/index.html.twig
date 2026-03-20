@@ -5,13 +5,42 @@
 {% block body %}
 <h1>Bienvenue sur IMTox !</h1>
 
-<div class="top-articles">
-    <h2>Top 5 des articles les plus lus</h2>
-    {% for article in topArticles %}
-        <div class="article">
-            <h3>{{ article.title }}</h3>
-            <p>{{ article.content }}</p>
+{% set latest = articles|first %}
+{% set others = articles|slice(1) %}
+
+<div class="latest-articles">
+
+  {# --- Latest Article --- #}
+  {% if latest %}
+    <section class="article article--featured">
+      <h1>{{ latest.title }}</h1>
+      <p>{{ latest.content|striptags|u.truncate(160, '…') }}</p>
+
+      <div class="meta">
+        <span>Last updated: {{ latest.getUpdateAt()|date('m/d/Y') }}</span>
+        <span class="author">👤 {{ latest.author.fullname }}</span>
+      </div>
+    </section>
+  {% endif %}
+
+  {# --- Other Articles Grid --- #}
+  <section class="article-grid">
+    {% for article in others %}
+      <div class="article-card">
+        <h2>
+          {{ loop.index + 1 }}{{ loop.index == 1 ? 'nd' : loop.index == 2 ? 'rd' : loop.index == 3 ? 'th' : 'th' }}
+          most recent
+        </h2>
+
+        <p>{{ article.content|striptags|u.truncate(160, '…') }}</p>
+
+        <div class="meta">
+          <span>Last updated: {{ article.updateAt|date('m/d/Y') }}</span>
+          <span class="author">👤 {{ article.author.fullname }}</span>
         </div>
+      </div>
     {% endfor %}
+  </section>
+
 </div>
 {% endblock %}

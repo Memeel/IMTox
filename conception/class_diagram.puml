@@ -7,7 +7,7 @@ class NewsReport {
     - content: String
     - createdAt: DateTime
     - publishedAt: DateTime
-    - updatedAt: DateTime
+    - updateAt: DateTime
     - numberOfViews: Integer
 }
 
