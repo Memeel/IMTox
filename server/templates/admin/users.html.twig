@@ -45,10 +45,10 @@
             <tr>
                 <td>{{ user.fullname }}</td>
                 <td>{{ user.mail }}</td>
-                <td>{{ user.role }}</td>
-                <td>{{ user.state }}</td>
+                <td>{{ user.role.value }}</td>
+                <td>{{ user.state.value }}</td>
                 <td>
-                    {% if user.state == 'active' %}
+                    {% if user.state.value == 'active' %}
                         {% include "admin/_user_lock_form.html.twig" %}   
                     {% else %}
                         {% include "admin/_user_unlock_form.html.twig" %}   

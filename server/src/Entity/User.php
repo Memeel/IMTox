@@ -69,7 +69,7 @@ class User implements
         return $this->login;
     }
 
-    public function setLogin(string $login): static
+    public function setLogin(?string $login): static
     {
         $this->login = $login;
 
@@ -81,7 +81,7 @@ class User implements
         return $this->password;
     }
 
-    public function setPassword(string $password): static
+    public function setPassword(?string $password): static
     {
         $this->password = $password;
 
@@ -93,12 +93,11 @@ class User implements
         return $this->mail;
     }
 
-    public function setMail(string $mail): static
-    {
-        $this->mail = $mail;
-
-        return $this;
-    }
+    public function setMail(?string $mail): static
+{
+    $this->mail = $mail;
+    return $this;
+}
 
     public function getFullname(): ?string
     {
