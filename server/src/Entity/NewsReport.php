@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enums\ArticleState;
 use App\Repository\NewsReportRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -31,8 +32,8 @@ class NewsReport
     #[ORM\Column]
     private ?int $numberOfViews = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $state = null;
+    #[ORM\Column(length: 32, enumType: ArticleState::class, nullable: false)]
+    private ArticleState $state = ArticleState::DRAFT;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -131,14 +132,18 @@ class NewsReport
         return $this;
     }
 
-    public function getState(): ?string
+    public function getState(): ArticleState
     {
         return $this->state;
     }
 
-    public function setState(string $state): static
+    public function setState(?ArticleState $state): static
     {
-        $this->state = $state;
+        if ($state == null) {
+            $this->state = ArticleState::DRAFT;
+        } else {
+            $this->state = $state;
+        }
 
         return $this;
     }

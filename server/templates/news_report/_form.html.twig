@@ -3,7 +3,7 @@
 {{ form_start(form) }}
     {{ form_widget(form) }}
 
-    <button class="btn"><a href="{{ path('show_drafts') }}">Cancel</a></button>
+    <button class="btn" type="button" onclick="window.location.href='{{ path('show_articles', {'state': 'draft', 'authorId': app.session.get('id')}) }}'">Cancel</button>
     <button class="btn" type="submit" name="save_action" value="draft">Save as Draft</button>
     <button class="btn" type="submit" name="save_action" value="publish">Publish</button>
 {{ form_end(form) }}

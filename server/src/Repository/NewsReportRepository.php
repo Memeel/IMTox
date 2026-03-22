@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Enums\ArticleState;
 use App\Entity\NewsReport;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -40,7 +41,7 @@ class NewsReportRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findArticle(string $state, $authorId): array
+    public function findArticle(ArticleState $state, $authorId): array
     {
         if ($authorId === null) {
             return [];
@@ -61,7 +62,7 @@ class NewsReportRepository extends ServiceEntityRepository
         return $query->getResult();
     }   
 
-    public function changeState(int $id, string $state): void
+    public function changeState(int $id, ArticleState $state): void
     {
         $entityManager = $this->getEntityManager();
        

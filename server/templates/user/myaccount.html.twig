@@ -53,7 +53,7 @@
                     {{ user.role.value }}
                 </span>
                 <span class="badge badge-articles">
-                    <a href="{{ path('show_drafts', {'authorId': user.id}) }}">
+                    <a href="{{ path('show_articles', {'state': 'draft', 'authorId': user.id}) }}">
                         Articles
                     </a>
                 </span>

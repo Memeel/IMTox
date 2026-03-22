@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Enums\ArticleState;
 use App\Entity\NewsReport;
 use App\Form\NewsReportType;
 use App\Repository\NewsReportRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,52 +14,63 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/account/article')]
+
 final class NewsReportController extends AbstractController
 {
-    #[Route('/', name: 'app_news_report_index', methods: ['GET'])]
-    public function list(NewsReportRepository $newsReportRepository): Response
-    {        return $this->render('news_report/index.html.twig', [
-            'news_reports' => $newsReportRepository->findAll(),
-        ]);
-    }
-
-    #[Route('/draft/{authorId?}', name: 'show_drafts', methods: ['GET'])]
-    public function showDrafts(int|null $authorId, Request $request, NewsReportRepository $newsReportRepository): Response
+    #[Route('/account/article/{state}/{authorId}', name: 'show_articles', methods: ['GET'])]
+    public function showArticles(string $state, int $authorId, Request $request, NewsReportRepository $newsReportRepository): Response
     {
-        if ($authorId === null) {
-            $authorId = $request->getSession()->get('id');
+        $sessionAuthorId = $request->getSession()->get('id');
+
+        if ($sessionAuthorId === null) {
+            return $this->redirectToRoute('app_user_login', [], Response::HTTP_SEE_OTHER);
         }
-        return $this->render('news_report/draft.html.twig', [
-            'draft_report' => $newsReportRepository->findArticle('draft', $authorId)
-        ]);
-    }
 
-    #[Route('/published/{authorId?}', name: 'show_published', methods: ['GET'])]
-    public function showPublished(int|null $authorId, Request $request, NewsReportRepository $newsReportRepository): Response
-    {
-        if ($authorId === null) {
-            $authorId = $request->getSession()->get('id');
+        if ((int) $sessionAuthorId !== $authorId) {
+            $this->addFlash('warning', 'You can only access your own articles.');
+
+            return $this->redirectToRoute('show_articles', [
+                'state' => $state,
+                'authorId' => (int) $sessionAuthorId,
+            ], Response::HTTP_SEE_OTHER);
         }
-        return $this->render('news_report/published.html.twig', [
-            'published_report' => $newsReportRepository->findArticle('published', $authorId)
+
+        $articleState = ArticleState::tryFrom($state);
+        if (!$articleState) {
+            throw $this->createNotFoundException('Invalid article state.');
+        }
+
+        return $this->render("news_report/my_articles.html.twig", [
+            'news_reports' => $newsReportRepository->findArticle($articleState, $authorId),
+            'state' => $state
         ]);
     }
 
-    #[Route('/create', name: 'create_report', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/account/article/create', name: 'create_report', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
+        $sessionAuthorId = $request->getSession()->get('id');
+        if ($sessionAuthorId === null) {
+            return $this->redirectToRoute('app_user_login', [], Response::HTTP_SEE_OTHER);
+        }
+
         $newsReport = new NewsReport();
         $form = $this->createForm(NewsReportType::class, $newsReport);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $author = $userRepository->find($sessionAuthorId);
+            if ($author === null) {
+                return $this->redirectToRoute('app_user_login', [], Response::HTTP_SEE_OTHER);
+            }
+
+            $newsReport->setAuthor($author);
+
             $this->applySaveAction($newsReport, $request->request->getString('save_action'));
             $entityManager->persist($newsReport);
             $entityManager->flush();
 
-            $route = $newsReport->getState() === 'published' ? 'show_published' : 'show_drafts';
-            return $this->redirectToRoute($route, [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('show_articles', ['state' => $newsReport->getState()->value, 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('news_report/new.html.twig', [
@@ -66,7 +79,7 @@ final class NewsReportController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/show', name: 'show_report', methods: ['GET'])]
+    #[Route('/article/show/{id}', name: 'show_report', methods: ['GET'], requirements: ['id' => '\\d+'])]
     public function show(Request $request, NewsReport $newsReport, EntityManagerInterface $entityManager): Response
     {
         $session = $request->getSession();
@@ -84,9 +97,18 @@ final class NewsReportController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'edit_report', methods: ['GET', 'POST'])]
+    #[Route('/article/edit/{id}', name: 'edit_report', methods: ['GET', 'POST'], requirements: ['id' => '\\d+'])]
     public function edit(Request $request, NewsReport $newsReport, EntityManagerInterface $entityManager): Response
     {
+        $sessionAuthorId = $request->getSession()->get('id');
+        if ($sessionAuthorId === null) {
+            return $this->redirectToRoute('app_user_login', [], Response::HTTP_SEE_OTHER);
+        }
+
+        if ($newsReport->getAuthor()?->getId() !== (int) $sessionAuthorId) {
+            throw $this->createAccessDeniedException('You can only edit your own articles.');
+        }
+
         $form = $this->createForm(NewsReportType::class, $newsReport);
         $form->handleRequest($request);
 
@@ -94,7 +116,7 @@ final class NewsReportController extends AbstractController
             $this->applySaveAction($newsReport, $request->request->getString('save_action'));
             $entityManager->flush();
 
-            return $this->redirectToRoute('show_drafts', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('show_articles', ['state' => $newsReport->getState()->value, 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('news_report/edit.html.twig', [
@@ -103,25 +125,47 @@ final class NewsReportController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/{state}', name: 'change_state', methods: ['GET'])]
-    public function changeState(string $state, NewsReport $newsReport, NewsReportRepository $newsReportRepository, EntityManagerInterface $entityManager): Response
-    {        
-        $newsReportRepository->changeState($newsReport->getId(), $state);
+    #[Route('/article/change-state/{id}/{state}', name: 'change_state', methods: ['GET'], requirements: ['id' => '\\d+'])]
+    public function changeState(Request $request, string $state, NewsReport $newsReport, NewsReportRepository $newsReportRepository, EntityManagerInterface $entityManager): Response
+    {
+        $sessionAuthorId = $request->getSession()->get('id');
+        if ($sessionAuthorId === null) {
+            return $this->redirectToRoute('app_user_login', [], Response::HTTP_SEE_OTHER);
+        }
+
+        if ($newsReport->getAuthor()?->getId() !== (int) $sessionAuthorId) {
+            throw $this->createAccessDeniedException('You can only change state of your own articles.');
+        }
+
+        $articleState = ArticleState::tryFrom($state);
+        if (!$articleState) {
+            throw $this->createNotFoundException('Invalid article state.');
+        }
+
+        $newsReportRepository->changeState($newsReport->getId(), $articleState);
         $entityManager->flush();
          
-        $route = $newsReport->getState() === 'draft' ? 'show_published' : 'show_drafts';
-        return $this->redirectToRoute($route, [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('show_articles', ['state' => $state, 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}', name: 'delete_report', methods: ['POST'])]
+    #[Route('/article/delete/{id}', name: 'delete_report', methods: ['POST'], requirements: ['id' => '\\d+'])]
     public function delete(Request $request, NewsReport $newsReport, EntityManagerInterface $entityManager): Response
     {
+        $sessionAuthorId = $request->getSession()->get('id');
+        if ($sessionAuthorId === null) {
+            return $this->redirectToRoute('app_user_login', [], Response::HTTP_SEE_OTHER);
+        }
+
+        if ($newsReport->getAuthor()?->getId() !== (int) $sessionAuthorId) {
+            throw $this->createAccessDeniedException('You can only delete your own articles.');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$newsReport->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($newsReport);
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('show_drafts', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('show_articles', ['state' => 'draft', 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
     }
 
     // Auteurs: Sadok LAJMI, Mélina WANG
@@ -140,12 +184,12 @@ final class NewsReportController extends AbstractController
         $newsReport->setUpdateAt($now);
 
         if ($saveAction === 'publish') {
-            $newsReport->setState('published');
+            $newsReport->setState(ArticleState::PUBLISHED);
             $newsReport->setPublishedAt($now);
             return;
         }
 
-        $newsReport->setState('draft');
+        $newsReport->setState(ArticleState::DRAFT);
 
         if ($newsReport->getPublishedAt() === null) {
             $newsReport->setPublishedAt($now);
