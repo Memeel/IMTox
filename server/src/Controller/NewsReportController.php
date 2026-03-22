@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enums\ArticleState;
 use App\Entity\NewsReport;
 use App\Form\NewsReportType;
 use App\Repository\NewsReportRepository;
@@ -34,8 +35,13 @@ final class NewsReportController extends AbstractController
             ], Response::HTTP_SEE_OTHER);
         }
 
+        $articleState = ArticleState::tryFrom($state);
+        if (!$articleState) {
+            throw $this->createNotFoundException('Invalid article state.');
+        }
+
         return $this->render("news_report/my_articles.html.twig", [
-            'news_reports' => $newsReportRepository->findArticle($state, $authorId),
+            'news_reports' => $newsReportRepository->findArticle($articleState, $authorId),
             'state' => $state
         ]);
     }
@@ -64,7 +70,7 @@ final class NewsReportController extends AbstractController
             $entityManager->persist($newsReport);
             $entityManager->flush();
 
-            return $this->redirectToRoute('show_articles', ['state' => $newsReport->getState(), 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('show_articles', ['state' => $newsReport->getState()->value, 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('news_report/new.html.twig', [
@@ -110,7 +116,7 @@ final class NewsReportController extends AbstractController
             $this->applySaveAction($newsReport, $request->request->getString('save_action'));
             $entityManager->flush();
 
-            return $this->redirectToRoute('show_articles', ['state' => $newsReport->getState(), 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('show_articles', ['state' => $newsReport->getState()->value, 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('news_report/edit.html.twig', [
@@ -131,7 +137,12 @@ final class NewsReportController extends AbstractController
             throw $this->createAccessDeniedException('You can only change state of your own articles.');
         }
 
-        $newsReportRepository->changeState($newsReport->getId(), $state);
+        $articleState = ArticleState::tryFrom($state);
+        if (!$articleState) {
+            throw $this->createNotFoundException('Invalid article state.');
+        }
+
+        $newsReportRepository->changeState($newsReport->getId(), $articleState);
         $entityManager->flush();
          
         return $this->redirectToRoute('show_articles', ['state' => $state, 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
@@ -173,12 +184,12 @@ final class NewsReportController extends AbstractController
         $newsReport->setUpdateAt($now);
 
         if ($saveAction === 'publish') {
-            $newsReport->setState('published');
+            $newsReport->setState(ArticleState::PUBLISHED);
             $newsReport->setPublishedAt($now);
             return;
         }
 
-        $newsReport->setState('draft');
+        $newsReport->setState(ArticleState::DRAFT);
 
         if ($newsReport->getPublishedAt() === null) {
             $newsReport->setPublishedAt($now);
