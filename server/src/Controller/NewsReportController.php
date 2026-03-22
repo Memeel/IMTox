@@ -22,19 +22,25 @@ final class NewsReportController extends AbstractController
         ]);
     }
 
-    #[Route('/draft', name: 'show_drafts', methods: ['GET'])]
-    public function showDrafts(NewsReportRepository $newsReportRepository): Response
+    #[Route('/draft/{authorId?}', name: 'show_drafts', methods: ['GET'])]
+    public function showDrafts(int|null $authorId, Request $request, NewsReportRepository $newsReportRepository): Response
     {
+        if ($authorId === null) {
+            $authorId = $request->getSession()->get('id');
+        }
         return $this->render('news_report/draft.html.twig', [
-            'draft_report' => $newsReportRepository->findArticle('draft')
+            'draft_report' => $newsReportRepository->findArticle('draft', $authorId)
         ]);
     }
 
-    #[Route('/published', name: 'show_published', methods: ['GET'])]
-    public function showPublished(NewsReportRepository $newsReportRepository): Response
+    #[Route('/published/{authorId?}', name: 'show_published', methods: ['GET'])]
+    public function showPublished(int|null $authorId, Request $request, NewsReportRepository $newsReportRepository): Response
     {
+        if ($authorId === null) {
+            $authorId = $request->getSession()->get('id');
+        }
         return $this->render('news_report/published.html.twig', [
-            'published_report' => $newsReportRepository->findArticle('published')
+            'published_report' => $newsReportRepository->findArticle('published', $authorId)
         ]);
     }
 

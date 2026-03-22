@@ -40,17 +40,23 @@ class NewsReportRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findArticle(string $state): array
+    public function findArticle(string $state, $authorId): array
     {
+        if ($authorId === null) {
+            return [];
+        }
+        
         $entityManager = $this->getEntityManager();
 
         $query = $entityManager->createQuery(
             'SELECT n
             FROM App\Entity\NewsReport n
-            WHERE n.state = :state
+            JOIN n.author u
+            WHERE n.state = :state AND u.id = :authorId
             ORDER BY n.updateAt DESC'
         );
         $query->setParameter('state', $state);
+        $query->setParameter('authorId', $authorId);
 
         return $query->getResult();
     }   

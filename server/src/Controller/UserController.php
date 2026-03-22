@@ -21,7 +21,7 @@ final class UserController extends AbstractController
     ) {
     }
 
-    #[Route(name: 'app_my_account', methods: ['GET'])]
+    #[Route(name: 'app_index', methods: ['GET'])]
     public function index(UserRepository $userRepository): Response
     {
         return $this->render('user/index.html.twig', [
@@ -53,8 +53,11 @@ final class UserController extends AbstractController
             );
             if ($isValid){
                 $session=$this->requestStack->getSession();
+                $session->set("id", $user->getId());
                 $session->set("login", $user->getLogin());
-                return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+                $session->set("role", $user->getRole());
+                $session->set("state", $user->getState());
+                return $this->redirectToRoute('app_my_account', [], Response::HTTP_SEE_OTHER);
             }else{
                 $code=Response::HTTP_UNPROCESSABLE_ENTITY;
                 $this->addFlash('danger', 'Invalid passowrd');
@@ -86,6 +89,12 @@ final class UserController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
+            $session = $this->requestStack->getSession();
+            $session->set("id", $user->getId());
+            $session->set("login", $user->getLogin());
+            $session->set("role", $user->getRole());
+            $session->set("state", $user->getState());
+
             return $this->redirectToRoute('app_my_account', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -103,6 +112,9 @@ final class UserController extends AbstractController
     {
         $session=$this->requestStack->getSession();
         $session->remove("login");
+        $session->remove("id");
+        $session->remove("role");
+        $session->remove("state");
         return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
     }
 
