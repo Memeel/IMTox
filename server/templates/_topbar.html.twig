@@ -6,8 +6,15 @@
         <a href="{{ path('app_home') }}" class="navbar-brand">IMTox</a>
     </div>
     <div class="navbar-center">
-        <form action="{{ path('app_home') }}" method="get" class="search-form"> {# Replace with the actual search route #}
-            <input type="search" name="q" placeholder="Search..." aria-label="Search"> {# Replace with the actual parameter name for search query #}
+        <form action="{{ path('app_search') }}" method="get" class="search-form">
+            <select name="search_type" aria-label="Filter search type">
+                <option value="" {% if app.request.query.get('search_type') == '' %}selected{% endif %}>All</option>
+                <option value="articles" {% if app.request.query.get('search_type') == 'articles' %}selected{% endif %}>Articles</option>
+                <option value="reporters" {% if app.request.query.get('search_type') == 'reporters' %}selected{% endif %}>Reporters</option>
+            </select>
+            
+            <input type="search" name="search" placeholder="Search..." aria-label="Search" value="{{ app.request.query.get('search', '') }}">
+            
             <button type="submit" aria-label="Submit search">
                 🔍
             </button>

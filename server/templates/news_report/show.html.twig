@@ -7,23 +7,13 @@
 {% block body %}
 <div class="container">
 
-    {# Back link #}
-    <div>
-        {% if news_report.state == 'draft'  %}
-            <a href="{{ path('show_drafts') }}">← Back to Drafts</a>
-        {% else %}
-            <a href="{{ path('show_published') }}">← Back to Articles</a>
-        {% endif %}
-    </div>
+    {# Title #}
+    <h1>{{ news_report.title }}</h1>
 
     {# Report Tag #}
-    
     <div class="tag">
         {{ news_report.tag.name }}
     </div>
-
-    {# Title #}
-    <h1>{{ news_report.title }}</h1>
 
     {# Meta info and views #}
     <div class="meta display-flex justify-content: space-between">
@@ -44,10 +34,12 @@
     </div>
 
     {# Footer actions #}
+    {% if app.session.get('id') == news_report.author.id %} 
     <div class="actions">
-        <a href="{{ path('edit_report', {'id': news_report.id}) }}">Edit</a>
+        <button class="modify" type="button" onclick="window.location.href='{{ path('edit_report', {'id': news_report.id}) }}'">Edit</button>
         {{ include('news_report/_delete_form.html.twig') }}
     </div>
+    {% endif %}
 
 </div>
 {% endblock %}

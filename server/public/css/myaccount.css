@@ -1,0 +1,116 @@
+/* Layout Global */
+.account-container {
+    display: grid;
+    grid-template-columns: 1fr 300px; /* Colonne droite plus petite */
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* Style des Blocs (Cards) */
+.card {
+    background: #ffffff;
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.card h2, .card h3 {
+    margin-top: 0;
+    color: #24292e;
+    border-bottom: 1px solid #f0f2f5;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Grille d'infos personnelles */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: #6a737d;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+}
+
+.info-group p {
+    font-size: 1.1rem;
+    margin: 0;
+    color: #2f363d;
+}
+
+/* Actions */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-edit {
+    background-color: #2ea44f;
+    color: white;
+}
+
+.back-link {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+}
+
+/* Sidebar & Badges */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    background: #e1e4e8;
+}
+
+.badge-admin { background: #ffdce0; color: #cf222e; } /* Exemple si Admin */
+.badge-reporter { background: #dbedff; color: #0969da; }
+.badge-articles { background: #c2ac70; color: #d8d2c1; margin-left: 0.5rem; }
+
+/* Stats List */
+.stats-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.stats-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px dashed #e1e4e8;
+}
+
+.stats-label { color: #57606a; }
+.stats-value { font-weight: bold; color: #24292e; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .account-container {
+        grid-template-columns: 1fr;
+    }
+    .account-sidebar {
+        order: -1; /* Sidebar passe au dessus sur mobile */
+    }
+}

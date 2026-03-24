@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }} {# Conserve le CSS du parent #}
+    <link rel="stylesheet" href="{{ asset('css/myaccount.css') }}">
+{% endblock %}
+
+{% block title %}My Account - {{ user.fullname }}{% endblock %}
+
+{% block body %}
+<div class="account-container">
+    {# Colonne de Gauche (Main Content) #}
+    <main class="account-main">
+        {# Bloc 1: Informations personnelles #}
+        <section class="card">
+            <h2>Personal Information</h2>
+            <div class="info-grid">
+                <div class="info-group">
+                    <label>Full Name</label>
+                    <p>{{ user.fullname }}</p>
+                </div>
+                <div class="info-group">
+                    <label>Login</label>
+                    <p>{{ user.login }}</p>
+                </div>
+                <div class="info-group">
+                    <label>Email Address</label>
+                    <p>{{ user.mail }}</p>
+                </div>
+            </div>
+        </section>
+
+        {# Bloc 2: Actions #}
+        <section class="card actions-card">
+            <h2>Account Management</h2>
+            <p>Manage your account settings and status.</p>
+            <div class="action-buttons">
+                <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-edit">Edit Profile</a>
+                <div class="delete-wrapper">
+                    {{ include('user/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {# Colonne de Droite (Sidebar / Bandeau) #}
+    <aside class="account-sidebar">
+        {# Section 1: Account Info (Role) #}
+        <section class="card sidebar-card">
+            <h3>Account Info</h3>
+            <div class="badge-container">
+                <span class="badge badge-{{ user.role.value|lower }}">
+                    {{ user.role.value }}
+                </span>
+                <span class="badge badge-articles">
+                    <a href="{{ path('show_articles', {'state': 'draft', 'authorId': user.id}) }}">
+                        Articles
+                    </a>
+                </span>
+            </div>
+        </section>
+
+        {# Section 2: Statistics #}
+        <section class="card sidebar-card">
+            <h3>Statistics</h3>
+            <ul class="stats-list">
+                <li>
+                    <span class="stats-label">Total Articles</span>
+                    <span class="stats-value">{{ total_articles|default(0) }}</span>
+                </li>
+                <li>
+                    <span class="stats-label">Total Views</span>
+                    <span class="stats-value">{{ total_views|default(0) }}</span>
+                </li>
+                <li>
+                    <span class="stats-label">Drafts</span>
+                    <span class="stats-value">{{ total_drafts|default(0) }}</span>
+                </li>
+            </ul>
+        </section>
+    </aside>
+</div>
+{% endblock %}

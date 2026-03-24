@@ -1,14 +1,14 @@
 {# Auteurs: Sadok LAJMI, Mélina WANG #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit NewsReport{% endblock %}
+{% block title %}Edit Article{% endblock %}
 
 {% block body %}
-    <h1>Edit NewsReport</h1>
+    <h1>Edit Article</h1>
 
     {{ include('news_report/_form.html.twig', {'button_label': 'Update'}) }}
 
-    <a href="{{ path('show_drafts') }}">back to list</a>
+    <a href="{{ path('show_articles', {'state': 'draft', 'authorId': app.session.get('id')}) }}">Back to list</a>
 
     {{ include('news_report/_delete_form.html.twig') }}
 {% endblock %}

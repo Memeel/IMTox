@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Search{% endblock %}
+
+{% block body %}
+<style> 
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; } 
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; } 
+    th { background: #f0f0f0; } button { margin-right: 5px; } 
+</style>
+
+<div class="search-results">
+    <h1>Search Results for "{{ search }}"</h1>
+
+    {% if searchType == 'articles' or searchType == '' %}
+        {% if articlesCount > 0 %}
+            <h2>Articles ({{ articlesCount }})</h2>
+            <table>
+            <tr> 
+                <th>Title</th>
+                <th>Author</th>
+                <th>Date</th>
+                <th>Views</th>
+            </tr>
+            {% for article in articles %}
+            <tr>
+                <td><a href="{{ path('show_report', {'id': article.id}) }}">{{ article.title }}</a></td>
+                <td>{{ article.author.fullName ?? 'Unknown' }}</td>
+                <td>{{ article.createdAt ? article.createdAt|date('d/m/Y') : '' }}</td>
+                <td>{{ article.numberOfViews ?? 0 }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <h2>No articles found.</h2>
+        {% endif %}
+    {% endif %}
+
+    {% if searchType == 'reporters' or searchType == '' %}
+    {% if reportersCount > 0 %}
+        <h2>Reporters ({{ reportersCount }})</h2>
+        <table>
+            <tr> 
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+            {% for reporter in reporters %}
+            <tr>
+                <td>{{ reporter.fullname }}</td>
+                <td>{{ reporter.mail }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <h2>No reporters found.</h2>
+    {% endif %}
+    {% endif %}
+
+{% endblock %}

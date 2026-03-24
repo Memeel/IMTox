@@ -26,13 +26,13 @@ class UserRepository extends ServiceEntityRepository
         );
     }
 
-    public function getNumberActiveUsers($users): int
+   public function getNumberActiveUsers(array $users): int
     {
-        return count(array_filter($users, fn($user) => $user->getState() === 'active'));
+        return count(array_filter($users, fn($user) => $user->getState()->value === 'active'));
     }
 
-    public function getNumberLockedUsers($users): int
+    public function getNumberLockedUsers(array $users): int
     {
-        return count(array_filter($users, fn($user) => $user->getState() === 'locked'));
+        return count(array_filter($users, fn($user) => $user->getState()->value === 'locked'));
     }
 }
