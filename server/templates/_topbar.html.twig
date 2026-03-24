@@ -2,8 +2,10 @@
     <div class="navbar-left">
         <a href="{{ path('app_home') }}" class="navbar-brand">IMTox</a>
         <a href="{{ path('app_stats') }}" class="navbar-link">📊 Statistics</a>
-        <a href="{{ path('app_admin_users') }}" class="navbar-link">🔧 Users</a>
-        <a href="{{ path('app_admin_tag_index') }}" class="navbar-link">🔧 Tags</a>
+        {% if is_admin %}
+            <a href="{{ path('app_admin_users') }}" class="navbar-link">🔧 Users</a>
+            <a href="{{ path('app_admin_tag_index') }}" class="navbar-link">🔧 Tags</a>
+        {% endif %}
     </div>
     <div class="navbar-center">
         <form action="{{ path('app_search') }}" method="get" class="search-form">
@@ -21,11 +23,12 @@
         </form>
     </div>
     <div class="navbar-right">
-        {% if true %}
+        {% if is_logged %}
             <a href="{{ path('app_my_account') }}" class="navbar-link" aria-label="Account">👤 My Account</a>
             <a href="{{ path('app_user_signout') }}" class="btn btn-primary" aria-label="Logout">↩ Sign Out</a>
         {% else %}
-            <a href="{{ path('app_home') }}" class="btn btn-primary">Sign In / Sign Up</a> {# Replace with the actual sign-in route #}
+            <a href="{{ path('app_user_login') }}" class="btn btn-primary">Login</a> 
+            <a href="{{ path('app_user_signup') }}" class="btn btn-primary">Sign Up</a>
         {% endif %}
     </div>
 </nav>

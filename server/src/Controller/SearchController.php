@@ -6,11 +6,16 @@ use App\Repository\NewsReportRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class SearchController extends AbstractController
 {
+    public function __construct(
+        private RequestStack $requestStack,
+    ) {}
+
     #[Route('/search', name: 'app_search')]
     public function search(Request $request, UserRepository $userRepository, NewsReportRepository $newsReportRepository): Response
     {
@@ -39,6 +44,8 @@ final class SearchController extends AbstractController
         $reportersCount = count($reporters);
 
         return $this->render('search/search.html.twig', [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'articles' => $articles,
             'reporters' => $reporters,
             'articlesCount' => $articlesCount,

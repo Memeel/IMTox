@@ -8,26 +8,17 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 #[Route]
 final class UserController extends AbstractController
 {
     public function __construct(
         private RequestStack $requestStack,
-    ) {
-    }
-
-    #[Route(name: 'app_index', methods: ['GET'])]
-    public function index(UserRepository $userRepository): Response
-    {
-        return $this->render('user/index.html.twig', [
-            'users' => $userRepository->findAll(),
-        ]);
-    }
+    ) {}
 
     #[Route('/signin', name: 'app_user_login', methods: ['GET', 'POST'])]
     public function login(UserPasswordHasherInterface $passwordHasher,UserRepository $userRepository,Request $request, EntityManagerInterface $entityManager){     
@@ -60,12 +51,14 @@ final class UserController extends AbstractController
                 return $this->redirectToRoute('app_my_account', [], Response::HTTP_SEE_OTHER);
             }else{
                 $code=Response::HTTP_UNPROCESSABLE_ENTITY;
-                $this->addFlash('danger', 'Invalid passowrd');
+                $this->addFlash('danger', 'Invalid password');
             }
         }
         }
 
         $response=$this->render('user/login.html.twig', [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'form' => $form,
         ]);
         $response->setStatusCode($statusCode);
@@ -102,6 +95,8 @@ final class UserController extends AbstractController
         $form->remove("state");
 
         return $this->render('user/new.html.twig', [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'user' => $user,
             'form' => $form,
         ]);
@@ -135,6 +130,8 @@ final class UserController extends AbstractController
         }
 
         return $this->render('user/myaccount.html.twig', [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'user' => $user,
             'total_articles' => 42,
             'total_views' => 1250,
@@ -159,6 +156,8 @@ final class UserController extends AbstractController
         $form->remove("state");
 
         return $this->render('user/edit.html.twig', [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'user' => $user,
             'form' => $form,
         ]);

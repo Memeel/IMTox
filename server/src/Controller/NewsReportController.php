@@ -11,12 +11,17 @@ use Doctrine\ORM\EntityManagerInterface;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 
 final class NewsReportController extends AbstractController
 {
+    public function __construct(
+        private RequestStack $requestStack,
+    ) {}
+
     #[Route('/account/article/{state}/{authorId}', name: 'show_articles', methods: ['GET'])]
     public function showArticles(string $state, int $authorId, Request $request, NewsReportRepository $newsReportRepository): Response
     {
@@ -41,6 +46,8 @@ final class NewsReportController extends AbstractController
         }
 
         return $this->render("news_report/my_articles.html.twig", [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'news_reports' => $newsReportRepository->findArticle($articleState, $authorId),
             'state' => $state
         ]);
@@ -74,6 +81,8 @@ final class NewsReportController extends AbstractController
         }
 
         return $this->render('news_report/new.html.twig', [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'news_report' => $newsReport,
             'form' => $form,
         ]);
@@ -93,6 +102,8 @@ final class NewsReportController extends AbstractController
             $session->set('viewed_articles', $viewed);
         }
         return $this->render('news_report/show.html.twig', [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'news_report' => $newsReport,
         ]);
     }
@@ -120,6 +131,8 @@ final class NewsReportController extends AbstractController
         }
 
         return $this->render('news_report/edit.html.twig', [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'news_report' => $newsReport,
             'form' => $form,
         ]);

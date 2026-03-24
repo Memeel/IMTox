@@ -9,6 +9,7 @@ use App\Repository\ReportTagRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\UserRepository;
@@ -16,6 +17,9 @@ use App\Entity\Enums\UserState;
 
 final class AdminController extends AbstractController
 {
+    public function __construct(
+        private RequestStack $requestStack,
+    ) {}
 
     #[Route('/admin', name: 'app_admin')]
     public function index(): Response
@@ -56,6 +60,8 @@ final class AdminController extends AbstractController
         $locked = $userRepo->getNumberLockedUsers($users);
 
         return $this->render('admin/users.html.twig', [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'users'  => $users,
             'active' => $active,
             'locked' => $locked,
@@ -102,6 +108,8 @@ final class AdminController extends AbstractController
     public function tags(ReportTagRepository $reportTagRepository): Response
     {
         return $this->render('admin/tag_index.html.twig', [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'tags' => $reportTagRepository->findAll(),
         ]);
     }
@@ -121,6 +129,8 @@ final class AdminController extends AbstractController
         }
 
         return $this->render('admin/tag_add.html.twig', [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'tag' => $tag,
             'form' => $form,
         ]);
@@ -139,6 +149,8 @@ final class AdminController extends AbstractController
         }
 
         return $this->render('admin/tag_edit.html.twig', [
+            'is_logged' => $this->requestStack->getSession()->get("login") != null,
+            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
             'tag' => $reportTag,
             'form' => $form,
         ]);
