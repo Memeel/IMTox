@@ -14,7 +14,7 @@
 
         {% set warnings = app.flashes('warning') %}
         {% if warnings|length > 0 %}
-            <div>
+            <div class="alert-warning">
                 {{ warnings|last }}
             </div>
         {% endif %}
