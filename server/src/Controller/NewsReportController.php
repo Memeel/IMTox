@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Enums\ArticleState;
+use App\Entity\Enums\UserRole;
 use App\Entity\NewsReport;
 use App\Form\NewsReportType;
 use App\Repository\NewsReportRepository;
@@ -22,22 +23,13 @@ final class NewsReportController extends AbstractController
         private RequestStack $requestStack,
     ) {}
 
-    #[Route('/account/article/{state}/{authorId}', name: 'show_articles', methods: ['GET'])]
-    public function showArticles(string $state, int $authorId, Request $request, NewsReportRepository $newsReportRepository): Response
+    #[Route('/account/articles/{state}', name: 'show_articles', methods: ['GET'])]
+    public function showArticles(string $state, NewsReportRepository $newsReportRepository): Response
     {
-        $sessionAuthorId = $request->getSession()->get('id');
+        $sessionAuthorId = $this->requestStack->getSession()->get("id");
 
         if ($sessionAuthorId === null) {
             return $this->redirectToRoute('app_user_login', [], Response::HTTP_SEE_OTHER);
-        }
-
-        if ((int) $sessionAuthorId !== $authorId) {
-            $this->addFlash('warning', 'You can only access your own articles.');
-
-            return $this->redirectToRoute('show_articles', [
-                'state' => $state,
-                'authorId' => (int) $sessionAuthorId,
-            ], Response::HTTP_SEE_OTHER);
         }
 
         $articleState = ArticleState::tryFrom($state);
@@ -47,8 +39,8 @@ final class NewsReportController extends AbstractController
 
         return $this->render("news_report/my_articles.html.twig", [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
-            'news_reports' => $newsReportRepository->findArticle($articleState, $authorId),
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
+            'news_reports' => $newsReportRepository->findArticle($articleState, $sessionAuthorId),
             'state' => $state
         ]);
     }
@@ -82,7 +74,7 @@ final class NewsReportController extends AbstractController
 
         return $this->render('news_report/new.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'news_report' => $newsReport,
             'form' => $form,
         ]);
@@ -103,7 +95,7 @@ final class NewsReportController extends AbstractController
         }
         return $this->render('news_report/show.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'news_report' => $newsReport,
         ]);
     }
@@ -132,7 +124,7 @@ final class NewsReportController extends AbstractController
 
         return $this->render('news_report/edit.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'news_report' => $newsReport,
             'form' => $form,
         ]);

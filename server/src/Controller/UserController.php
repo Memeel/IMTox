@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enums\UserRole;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
@@ -58,7 +59,7 @@ final class UserController extends AbstractController
 
         $response=$this->render('user/login.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'form' => $form,
         ]);
         $response->setStatusCode($statusCode);
@@ -96,7 +97,7 @@ final class UserController extends AbstractController
 
         return $this->render('user/new.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'user' => $user,
             'form' => $form,
         ]);
@@ -131,7 +132,7 @@ final class UserController extends AbstractController
 
         return $this->render('user/myaccount.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'user' => $user,
             'total_articles' => 42,
             'total_views' => 1250,
@@ -157,7 +158,7 @@ final class UserController extends AbstractController
 
         return $this->render('user/edit.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'user' => $user,
             'form' => $form,
         ]);

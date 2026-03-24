@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enums\UserRole;
 use App\Entity\ReportTag;
 use App\Entity\User;
 use App\Form\ReportTagType;
@@ -61,7 +62,7 @@ final class AdminController extends AbstractController
 
         return $this->render('admin/users.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'users'  => $users,
             'active' => $active,
             'locked' => $locked,
@@ -109,7 +110,7 @@ final class AdminController extends AbstractController
     {
         return $this->render('admin/tag_index.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'tags' => $reportTagRepository->findAll(),
         ]);
     }
@@ -130,7 +131,7 @@ final class AdminController extends AbstractController
 
         return $this->render('admin/tag_add.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'tag' => $tag,
             'form' => $form,
         ]);
@@ -150,7 +151,7 @@ final class AdminController extends AbstractController
 
         return $this->render('admin/tag_edit.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'tag' => $reportTag,
             'form' => $form,
         ]);

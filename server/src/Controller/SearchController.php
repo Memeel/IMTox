@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enums\UserRole;
 use App\Repository\NewsReportRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,7 +46,7 @@ final class SearchController extends AbstractController
 
         return $this->render('search/search.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'articles' => $articles,
             'reporters' => $reporters,
             'articlesCount' => $articlesCount,

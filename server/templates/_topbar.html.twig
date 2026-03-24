@@ -24,6 +24,7 @@
     </div>
     <div class="navbar-right">
         {% if is_logged %}
+            <a href="{{ path(name = 'show_articles', parameters = {state: 'published' }) }}" class="navbar-link" aria-label="My Articles">📰 My Articles</a>
             <a href="{{ path('app_my_account') }}" class="navbar-link" aria-label="Account">👤 My Account</a>
             <a href="{{ path('app_user_signout') }}" class="btn btn-primary" aria-label="Logout">↩ Sign Out</a>
         {% else %}

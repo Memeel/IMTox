@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enums\UserRole;
 use App\Repository\NewsReportRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -25,7 +26,7 @@ final class HomeController extends AbstractController
     {
         return $this->render('home/index.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == "admin",
+            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'articles'=> $newsReportRepository->find5LatestArticlesForHome(),
         ]);
     }
