@@ -115,7 +115,7 @@ final class UserController extends AbstractController
         $session->remove("id");
         $session->remove("role");
         $session->remove("state");
-        return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/myaccount', name: 'app_my_account', methods: ['GET'])]
@@ -172,6 +172,6 @@ final class UserController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_news_report_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_home', [], Response::HTTP_SEE_OTHER);
     }
 }
