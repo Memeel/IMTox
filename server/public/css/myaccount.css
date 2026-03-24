@@ -86,7 +86,7 @@
 
 .badge-admin { background: #ffdce0; color: #cf222e; } /* Exemple si Admin */
 .badge-reporter { background: #dbedff; color: #0969da; }
-.badge-articles { background: #c2ac70; color: #d8d2c1; margin-left: 0.5rem; }
+.badge-articles { background: #ec8f33; color: white; }
 
 /* Stats List */
 .stats-list {
