@@ -83,6 +83,12 @@ final class NewsReportController extends AbstractController
     #[Route('/article/show/{id}', name: 'show_report', methods: ['GET'], requirements: ['id' => '\\d+'])]
     public function show(Request $request, NewsReport $newsReport, EntityManagerInterface $entityManager): Response
     {
+        $sessionAuthorId = $request->getSession()->get('id');
+
+        if ($newsReport->getState() !== ArticleState::PUBLISHED && $newsReport->getAuthor()?->getId() !== (int) $sessionAuthorId) {
+            throw $this->createAccessDeniedException('This article is not publicly available.');
+        }
+
         $session = $request->getSession();
         $viewed = $session->get('viewed_articles', []);
 
@@ -130,7 +136,7 @@ final class NewsReportController extends AbstractController
         ]);
     }
 
-    #[Route('/article/change-state/{id}/{state}', name: 'change_state', methods: ['GET'], requirements: ['id' => '\\d+'])]
+    #[Route('/article/change-state/{id}/{state}', name: 'change_state', methods: ['POST'], requirements: ['id' => '\\d+'])]
     public function changeState(Request $request, string $state, NewsReport $newsReport, NewsReportRepository $newsReportRepository, EntityManagerInterface $entityManager): Response
     {
         $sessionAuthorId = $request->getSession()->get('id');
@@ -145,6 +151,10 @@ final class NewsReportController extends AbstractController
         $articleState = ArticleState::tryFrom($state);
         if (!$articleState) {
             throw $this->createNotFoundException('Invalid article state.');
+        }
+
+        if (!$this->isCsrfTokenValid('change_state' . $newsReport->getId() . $state, $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
         $newsReportRepository->changeState($newsReport->getId(), $articleState);

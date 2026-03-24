@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enums\ArticleState;
 use App\Entity\Enums\UserRole;
 use App\Repository\NewsReportRepository;
 use App\Repository\UserRepository;
@@ -36,8 +37,9 @@ final class SearchController extends AbstractController
 
         if ($searchType === 'articles' || $searchType === '') {
             $qb = $newsReportRepository->createQueryBuilder('n');
-            $qb->andWhere('n.title LIKE :search OR n.content LIKE :search')
-                ->setParameter('search', '%'.$search.'%');
+            $qb->andWhere('(n.title LIKE :search OR n.content LIKE :search) AND n.state = :state')
+                ->setParameter('search', '%'.$search.'%')
+                ->setParameter('state', ArticleState::PUBLISHED->value);
             $articles = $qb->getQuery()->getResult();
         }
 

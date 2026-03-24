@@ -39,10 +39,16 @@
                         <a class="view" href="{{ path('show_report', {'id': news_report.id}) }}">View</a>
                         <a class="modify" href="{{ path('edit_report', {'id': news_report.id}) }}">Modify</a>
                         {% if state == 'published' %}
-                        <a class="publish" href="{{ path('change_state', {'id': news_report.id, 'state': 'draft'}) }}">Unpublish</a>
+                        <form class="publish-form" method="post" action="{{ path('change_state', {'id': news_report.id, 'state': 'draft'}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('change_state' ~ news_report.id ~ 'draft') }}">
+                            <button class="publish" type="submit">Unpublish</button>
+                        </form>
                         {% endif %}
                         {% if state == 'draft' %}
-                        <a class="publish" href="{{ path('change_state', {'id': news_report.id, 'state': 'published'}) }}">Publish</a>
+                        <form class="publish-form" method="post" action="{{ path('change_state', {'id': news_report.id, 'state': 'published'}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('change_state' ~ news_report.id ~ 'published') }}">
+                            <button class="publish" type="submit">Publish</button>
+                        </form>
                         {% endif %}
                     </div>
                 </div>
