@@ -34,7 +34,16 @@ body {
 }
 
 .navbar-brand {
+  margin-right: 3rem;
   font-weight: 600;
+  font-size: 1.8rem;
+  color: #000;
+  text-decoration: none;
+}
+
+.navbar-link {
+  margin-right: 2rem;
+  font-weight: 200;
   font-size: 1.1rem;
   color: #000;
   text-decoration: none;
@@ -108,4 +117,9 @@ body {
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid #ccc;
+}
+
+.article-grid a {
+  text-decoration: none;
+  color: inherit;
 }

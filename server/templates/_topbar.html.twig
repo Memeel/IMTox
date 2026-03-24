@@ -1,9 +1,9 @@
 <nav class="navbar">
     <div class="navbar-left">
-        <button class="menu-toggle" aria-label="Toggle menu">
-            &#9776; {# Hamburger icon #}
-        </button>
         <a href="{{ path('app_home') }}" class="navbar-brand">IMTox</a>
+        <a href="{{ path('app_stats') }}" class="navbar-link">📊 Statistics</a>
+        <a href="{{ path('app_admin_users') }}" class="navbar-link">🔧 Users</a>
+        <a href="{{ path('app_admin_tag_index') }}" class="navbar-link">🔧 Tags</a>
     </div>
     <div class="navbar-center">
         <form action="{{ path('app_search') }}" method="get" class="search-form">
@@ -21,10 +21,9 @@
         </form>
     </div>
     <div class="navbar-right">
-        {% if false %}
-            <a href="{{ path('app_home') }}" class="account-button" aria-label="Account"> {# Replace with the actual account route #}
-                <img src="{{ asset('images/account-icon.png') }}" alt="Account" class="account-icon" />
-            </a>
+        {% if true %}
+            <a href="{{ path('app_my_account') }}" class="navbar-link" aria-label="Account">👤 My Account</a>
+            <a href="{{ path('app_user_signout') }}" class="btn btn-primary" aria-label="Logout">↩ Sign Out</a>
         {% else %}
             <a href="{{ path('app_home') }}" class="btn btn-primary">Sign In / Sign Up</a> {# Replace with the actual sign-in route #}
         {% endif %}
