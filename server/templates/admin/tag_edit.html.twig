@@ -3,11 +3,16 @@
 {% block title %}Edit Tag{% endblock %}
 
 {% block body %}
-    <h1>Edit Tag</h1>
+    {% if is_admin %}
+        <h1>Edit Tag</h1>
 
-    {{ include('admin/_tag_form.html.twig', {'button_label': 'Update'}) }}
+        {{ include('admin/_tag_form.html.twig', {'button_label': 'Update'}) }}
 
-    <a href="{{ path('app_admin_tag_index') }}">back to list</a>
+        <a href="{{ path('app_admin_tag_index') }}">back to list</a>
 
-    {{ include('admin/_tag_delete_form.html.twig') }}
+        {{ include('admin/_tag_delete_form.html.twig') }}
+    {% else %}
+        {% include "admin/_not_authorized.html.twig" %}
+    {% endif %}
 {% endblock %}
+
