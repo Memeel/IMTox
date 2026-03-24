@@ -1,9 +1,15 @@
 {# Auteurs: Sadok LAJMI, Mélina WANG #}
+{{ form_start(form, {'attr': {'class': 'article-form'}}) }}
+   
+    {{ form_row(form.title) }}
+    {{ form_row(form.tag) }}
+    {{ form_row(form.content) }}
 
-{{ form_start(form) }}
-    {{ form_widget(form) }}
+    <input type="hidden" name="_token" value="{{ csrf_token('create_edit' ~ news_report.id) }}">
 
-    <button class="btn" type="button" onclick="window.location.href='{{ path('show_articles', {'state': 'draft', 'authorId': app.session.get('id')}) }}'">Cancel</button>
-    <button class="btn" type="submit" name="save_action" value="draft">Save as Draft</button>
-    <button class="btn" type="submit" name="save_action" value="publish">Publish</button>
+    <div class="article-form-actions">
+        <button class="article-btn article-btn-cancel" type="button" onclick="window.location.href='{{ path('show_articles', {'state': 'draft', 'authorId': app.session.get('id')}) }}'">Cancel</button>
+        <button class="article-btn article-btn-draft" type="submit" name="save_action" value="draft">Save as Draft</button>
+        <button class="article-btn article-btn-publish" type="submit" name="save_action" value="publish">Publish</button>
+    </div>
 {{ form_end(form) }}

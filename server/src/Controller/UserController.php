@@ -32,7 +32,7 @@ final class UserController extends AbstractController
         $form->handleRequest($request);
         
         $statusCode = $form->isSubmitted() ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_OK;
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid() && $this->isCsrfTokenValid('user' . $user->getId(), $request->getPayload()->getString('_token'))) {
             $plaintextPassword = $user->getPassword();
             $user = $userRepository->findOneBy(["login" => $user->getLogin()]);
             if(!$user){
@@ -61,6 +61,7 @@ final class UserController extends AbstractController
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
             'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'form' => $form,
+            'user' => $user,
         ]);
         $response->setStatusCode($statusCode);
         return $response;
@@ -71,9 +72,11 @@ final class UserController extends AbstractController
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
+        $form->remove("role");
+        $form->remove("state");
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid() && $this->isCsrfTokenValid('user' . $user->getId(), $request->getPayload()->getString('_token'))) {
             $plaintextPassword = $user->getPassword();
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
@@ -91,9 +94,6 @@ final class UserController extends AbstractController
 
             return $this->redirectToRoute('app_my_account', [], Response::HTTP_SEE_OTHER);
         }
-
-        $form->remove("role");
-        $form->remove("state");
 
         return $this->render('user/new.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
