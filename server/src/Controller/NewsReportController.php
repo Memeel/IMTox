@@ -57,7 +57,7 @@ final class NewsReportController extends AbstractController
         $form = $this->createForm(NewsReportType::class, $newsReport);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid() && $this->isCsrfTokenValid('create_edit', $request->getPayload()->getString('_token'))) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $author = $userRepository->find($sessionAuthorId);
             if ($author === null) {
                 return $this->redirectToRoute('app_user_login', [], Response::HTTP_SEE_OTHER);
@@ -121,7 +121,7 @@ final class NewsReportController extends AbstractController
         $form = $this->createForm(NewsReportType::class, $newsReport);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid() && $this->isCsrfTokenValid('create_edit' . $newsReport->getId(), $request->getPayload()->getString('_token'))) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->applySaveAction($newsReport, $request->request->getString('save_action'));
             $entityManager->flush();
 
