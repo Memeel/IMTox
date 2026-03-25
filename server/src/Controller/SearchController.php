@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Enums\ArticleState;
 use App\Entity\Enums\UserRole;
+use App\Entity\Enums\UserState;
 use App\Repository\NewsReportRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,9 +30,10 @@ final class SearchController extends AbstractController
 
         if ($searchType === 'reporters' || $searchType === '') {
             $qb = $userRepository->createQueryBuilder('u');
-            $qb->andWhere('u.fullname LIKE :search AND u.role = :role')
+            $qb->andWhere('u.fullname LIKE :search AND u.role = :role AND u.state != :state')
                 ->setParameter('search', '%'.$search.'%')
-                ->setParameter('role', 'reporter');
+                ->setParameter('role', UserRole::REPORTER->value)
+                ->setParameter('state', UserState::DELETED->value);
             $reporters = $qb->getQuery()->getResult();
         }
 
