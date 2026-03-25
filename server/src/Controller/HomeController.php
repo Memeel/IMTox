@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @author Julien Orsoni <julien.orsoni@imt-atlantique.net>
+ * @author Cyprien Gingelwein <cyprien.gingelwein@imt-atlantique.net>
+ */
+
 namespace App\Controller;
 
 use App\Entity\Enums\UserRole;

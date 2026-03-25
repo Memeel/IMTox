@@ -1,3 +1,6 @@
+<!-- @author Julien Orsoni <julien.orsoni@imt-atlantique.net> -->
+<!-- @author Cyprien Gingelwein <cyprien.gingelwein@imt-atlantique.net> -->
+
 <form method="get" action="{{ path('app_admin_tag_edit', {'id': tag.id}) }}">
     <input type="hidden" name="_token" value="{{ csrf_token('edit' ~ tag.id) }}">
     <button class="btn">✏️</button>
