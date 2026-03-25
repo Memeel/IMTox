@@ -46,6 +46,7 @@
     <div class="stats-container">
         <div>
             <h2>Top Articles</h2>
+            {# Article Statistics Table #}
             <table>
                 <tr><th>Rank</th><th>Title</th><th>Author</th><th>Total Views</th></tr>
                 {% for article in articles %}
@@ -62,6 +63,7 @@
 
         <div>
             <h2>Top Reporters</h2>
+            {# Reporter Statistics Table #}
             <table>
                 <tr><th>Rank</th><th>Reporter</th><th>Articles</th><th>Total Views</th></tr>
                 {% for reporter in reporters %}

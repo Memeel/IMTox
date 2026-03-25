@@ -16,7 +16,7 @@
 
         <div class="user-management">
             <h1>User Management</h1>
-
+            {# User Filtering Form #}
             <form method="get" action="{{ path('app_admin_users') }}">
                 <div class="filters">
                     <input type="text" name="search" placeholder="Search by name or email" value="{{ app.request.query.get('search') }}">
@@ -36,6 +36,7 @@
                     <button type="submit">Filter</button>
                 </div>
             </form>
+            {# User Table #}
             {% if users|length > 0%}
                 <p>Number of Users: {{ users|length }} (Active: {{ active }}, Locked: {{ locked }})</p>
                 <table>

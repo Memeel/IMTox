@@ -23,6 +23,12 @@ use App\Entity\Enums\UserState;
 
 final class AdminController extends AbstractController
 {
+    /**
+     * AdminController
+     *
+     * Handles admin-only pages and actions: user management and tag management.
+     * Access is gated with a session role check against UserRole::ADMIN.
+     */
     public function __construct(
         private RequestStack $requestStack,
     ) {}
@@ -30,51 +36,58 @@ final class AdminController extends AbstractController
     #[Route('/admin', name: 'app_admin')]
     public function index(): Response
     {
+        // Redirect to the users list as default admin landing page
         return $this->redirectToRoute('app_admin_users');
     }
 
     #[Route('/admin/users', name: 'app_admin_users')]
     public function listUsers(Request $request, UserRepository $userRepo)
     {
-        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+        // Only allow admins to access this route
+        if ($this->requestStack->getSession()->get('role') != UserRole::ADMIN) {
             return $this->redirectToRoute('app');
         }
 
+        // Read filter query parameters (optional)
         $search = $request->query->get('search');
         $role   = $request->query->get('role');
         $state  = $request->query->get('state');
 
         $qb = $userRepo->createQueryBuilder('u');
 
-        // Exclure les deleted
+        // Exclude users marked as deleted
         $qb->andWhere('u.state != :deleted')
-        ->setParameter('deleted', UserState::DELETED);
+           ->setParameter('deleted', UserState::DELETED);
 
         if ($search) {
+            // Filter by fullname or mail containing the search term
             $qb->andWhere('u.fullname LIKE :search OR u.mail LIKE :search')
-            ->setParameter('search', '%'.$search.'%');
+               ->setParameter('search', '%'.$search.'%');
         }
 
         if ($role) {
+            // Filter by role value
             $qb->andWhere('u.role = :role')
-            ->setParameter('role', $role);
+               ->setParameter('role', $role);
         }
 
         if ($state) {
+            // Filter by account state
             $qb->andWhere('u.state = :state')
-            ->setParameter('state', $state);
+               ->setParameter('state', $state);
         }
 
         $users = $qb->getQuery()->getResult();
         $active = $userRepo->getNumberActiveUsers($users);
         $locked = $userRepo->getNumberLockedUsers($users);
 
+        // Render the users list template with computed stats
         return $this->render('admin/users.html.twig', [
-            'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
-            'users'  => $users,
-            'active' => $active,
-            'locked' => $locked,
+            'is_logged' => $this->requestStack->getSession()->get('login') != null,
+            'is_admin'  => $this->requestStack->getSession()->get('role') == UserRole::ADMIN,
+            'users'     => $users,
+            'active'    => $active,
+            'locked'    => $locked,
         ]);
     }
     #[Route('/admin/user/delete/{id}', name: 'app_admin_user_delete', methods: ['POST'])]
@@ -84,8 +97,9 @@ final class AdminController extends AbstractController
             return $this->redirectToRoute('app');
         }
 
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
-
+        // Validate CSRF token before performing destructive action
+        if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
+            // Soft-delete: clear sensitive fields and mark as deleted
             $user->setState(UserState::DELETED);
             $user->setLogin("deleted" . strval($user->getId()));
             $user->setMail("deleted" . strval($user->getId()));
@@ -104,12 +118,14 @@ final class AdminController extends AbstractController
     #[Route('/admin/user/lock/{id}', name: 'app_admin_user_lock', methods: ['POST'])]
     public function lockUser(User $user, Request $request, EntityManagerInterface $em): Response
     {
-        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+        // Admin guard
+        if ($this->requestStack->getSession()->get('role') != UserRole::ADMIN) {
             return $this->redirectToRoute('app');
         }
 
-        if ($this->isCsrfTokenValid('lock'.$user->getId(), $request->request->get('_token'))) {
-            $user->setState(UserState::LOCKED); // <- enum
+        // Protect action with CSRF token
+        if ($this->isCsrfTokenValid('lock' . $user->getId(), $request->request->get('_token'))) {
+            $user->setState(UserState::LOCKED);
             $em->flush();
         }
 
@@ -118,12 +134,12 @@ final class AdminController extends AbstractController
     #[Route('/admin/user/unlock/{id}', name: 'app_admin_user_unlock', methods: ['POST'])]
     public function unlockUser(User $user, Request $request, EntityManagerInterface $em): Response
     {
-        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+        if ($this->requestStack->getSession()->get('role') != UserRole::ADMIN) {
             return $this->redirectToRoute('app');
         }
 
-        if ($this->isCsrfTokenValid('unlock'.$user->getId(), $request->request->get('_token'))) {
-            $user->setState(UserState::ACTIVE); // <- enum
+        if ($this->isCsrfTokenValid('unlock' . $user->getId(), $request->request->get('_token'))) {
+            $user->setState(UserState::ACTIVE);
             $em->flush();
         }
 
@@ -133,24 +149,26 @@ final class AdminController extends AbstractController
     #[Route('/admin/tags', name: 'app_admin_tag_index')]
     public function tags(ReportTagRepository $reportTagRepository): Response
     {
-        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+        // Only admins may manage tags
+        if ($this->requestStack->getSession()->get('role') != UserRole::ADMIN) {
             return $this->redirectToRoute('app');
         }
 
         return $this->render('admin/tag_index.html.twig', [
-            'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
-            'tags' => $reportTagRepository->findAll(),
+            'is_logged' => $this->requestStack->getSession()->get('login') != null,
+            'is_admin'  => $this->requestStack->getSession()->get('role') == UserRole::ADMIN,
+            'tags'      => $reportTagRepository->findAll(),
         ]);
     }
 
     #[Route('/admin/tags/add', name: 'app_admin_tag_add', methods: ['GET', 'POST'])]
     public function addTag(Request $request, EntityManagerInterface $entityManager): Response
     {
-        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+        if ($this->requestStack->getSession()->get('role') != UserRole::ADMIN) {
             return $this->redirectToRoute('app');
         }
 
+        // Build and handle the tag form
         $tag = new ReportTag();
         $form = $this->createForm(ReportTagType::class, $tag);
         $form->handleRequest($request);
@@ -163,20 +181,21 @@ final class AdminController extends AbstractController
         }
 
         return $this->render('admin/tag_add.html.twig', [
-            'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
-            'tag' => $tag,
-            'form' => $form,
+            'is_logged' => $this->requestStack->getSession()->get('login') != null,
+            'is_admin'  => $this->requestStack->getSession()->get('role') == UserRole::ADMIN,
+            'tag'       => $tag,
+            'form'      => $form,
         ]);
     }
 
     #[Route('/admin/tags/{id}/edit', name: 'app_admin_tag_edit', methods: ['GET', 'POST'])]
     public function editTag(Request $request, ReportTag $reportTag, EntityManagerInterface $entityManager): Response
     {
-        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+        if ($this->requestStack->getSession()->get('role') != UserRole::ADMIN) {
             return $this->redirectToRoute('app');
         }
 
+        // Edit existing tag via form
         $form = $this->createForm(ReportTagType::class, $reportTag);
         $form->handleRequest($request);
 
@@ -187,21 +206,22 @@ final class AdminController extends AbstractController
         }
 
         return $this->render('admin/tag_edit.html.twig', [
-            'is_logged' => $this->requestStack->getSession()->get("login") != null,
-            'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
-            'tag' => $reportTag,
-            'form' => $form,
+            'is_logged' => $this->requestStack->getSession()->get('login') != null,
+            'is_admin'  => $this->requestStack->getSession()->get('role') == UserRole::ADMIN,
+            'tag'       => $reportTag,
+            'form'      => $form,
         ]);
     }
 
     #[Route('/admin/tags/{id}', name: 'app_admin_tag_delete', methods: ['POST'])]
     public function deleteTag(Request $request, ReportTag $tag, EntityManagerInterface $entityManager): Response
     {
-        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+        if ($this->requestStack->getSession()->get('role') != UserRole::ADMIN) {
             return $this->redirectToRoute('app');
         }
 
-        if ($this->isCsrfTokenValid('delete'.$tag->getId(), $request->getPayload()->getString('_token'))) {
+        // Validate CSRF and remove tag
+        if ($this->isCsrfTokenValid('delete' . $tag->getId(), $request->request->get('_token'))) {
             $entityManager->remove($tag);
             $entityManager->flush();
         }
