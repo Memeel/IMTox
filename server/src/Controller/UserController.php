@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Enums\UserRole;
+
+use App\Entity\Enums\UserState;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\NewsReportRepository;
@@ -45,13 +47,18 @@ final class UserController extends AbstractController
                 $user,
                 $plaintextPassword
             );
-            if ($isValid){
-                $session=$this->requestStack->getSession();
-                $session->set("id", $user->getId());
-                $session->set("login", $user->getLogin());
-                $session->set("role", $user->getRole());
-                $session->set("state", $user->getState());
-                return $this->redirectToRoute('app_my_account', [], Response::HTTP_SEE_OTHER);
+            if ($isValid) {
+                if($user->getState() == UserState::LOCKED){
+                    $code=Response::HTTP_UNPROCESSABLE_ENTITY;
+                    $this->addFlash('danger', 'Your account is locked, please contact support');
+                }else{
+                    $session=$this->requestStack->getession();
+                    $session->set("id", $user->getId());
+                    $session->set("login", $user->getLogin());
+                    $session->set("role", $user->getRole());
+                    $session->set("state", $user->getState());
+                    return $this->redirectToRoute('app_my_account', [], Response::HTTP_SEE_OTHER);
+                }
             }else{
                 $code=Response::HTTP_UNPROCESSABLE_ENTITY;
                 $this->addFlash('danger', 'Invalid password');
