@@ -91,4 +91,27 @@ class NewsReportRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function countAuthorViewsAndArticles(int $authorId) {
+        $qb = $this->createQueryBuilder('nr');
+
+        $qb->select('COUNT(nr.id) as numberOfArticles, SUM(nr.numberOfViews) as totalViews')
+        ->join('nr.author', 'u')
+        ->andWhere('nr.author = :authorId')
+        ->setParameter('authorId', $authorId);
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    public function countAuthorDrafts(int $authorId): int {
+        $qb = $this->createQueryBuilder('nr');
+
+        $qb->select('COUNT(nr.id)')
+        ->andWhere('nr.author = :authorId')
+        ->andWhere('nr.state = :state') 
+        ->setParameter('authorId', $authorId)
+        ->setParameter('state', 'draft');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
 }

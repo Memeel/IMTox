@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\Enums\UserRole;
 use App\Entity\User;
 use App\Form\UserType;
+use App\Repository\NewsReportRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -115,7 +117,7 @@ final class UserController extends AbstractController
     }
 
     #[Route('/myaccount', name: 'app_my_account', methods: ['GET'])]
-    public function show(UserRepository $userRepository): Response
+    public function show(UserRepository $userRepository, NewsReportRepository $newsReportRepository, LoggerInterface $logger): Response
     {
         $session=$this->requestStack->getSession();
 
@@ -126,6 +128,9 @@ final class UserController extends AbstractController
         $login = $session->get("login");
         $user = $userRepository->findOneBy(["login" => $login]);
 
+        $articlesStats = $newsReportRepository->countAuthorViewsAndArticles($session->get("id"));
+        $draftCount = $newsReportRepository->countAuthorDrafts($session->get("id"));
+
         if($user == null) {
             return $this->redirectToRoute('app_user_signup', [], Response::HTTP_SEE_OTHER);
         }
@@ -134,9 +139,9 @@ final class UserController extends AbstractController
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
             'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
             'user' => $user,
-            'total_articles' => 42,
-            'total_views' => 1250,
-            'total_drafts' => 3,
+            'total_articles' => $articlesStats['numberOfArticles'],
+            'total_views' => $articlesStats['totalViews'],
+            'total_drafts' => $draftCount,
         ]);
     }
 
