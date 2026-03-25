@@ -1,3 +1,6 @@
+<!-- @author Julien Orsoni <julien.orsoni@imt-atlantique.net> -->
+<!-- @author Cyprien Gingelwein <cyprien.gingelwein@imt-atlantique.net> -->
+
 <form method="post" action="{{ path('app_admin_user_unlock', {'id': user.id}) }}" onsubmit="return confirm('Are you sure you want to unlock this user?');">
     <input type="hidden" name="_token" value="{{ csrf_token('unlock' ~ user.id) }}">
     <button class="btn">Unock</button>
