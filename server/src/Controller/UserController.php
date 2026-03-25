@@ -52,7 +52,7 @@ final class UserController extends AbstractController
                     $code=Response::HTTP_UNPROCESSABLE_ENTITY;
                     $this->addFlash('danger', 'Your account is locked, please contact support');
                 }else{
-                    $session=$this->requestStack->getession();
+                    $session=$this->requestStack->getSession();
                     $session->set("id", $user->getId());
                     $session->set("login", $user->getLogin());
                     $session->set("role", $user->getRole());
