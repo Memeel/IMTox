@@ -31,6 +31,10 @@ final class AdminController extends AbstractController
     #[Route('/admin/users', name: 'app_admin_users')]
     public function listUsers(Request $request, UserRepository $userRepo)
     {
+        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+            return $this->redirectToRoute('app');
+        }
+
         $search = $request->query->get('search');
         $role   = $request->query->get('role');
         $state  = $request->query->get('state');
@@ -71,6 +75,10 @@ final class AdminController extends AbstractController
     #[Route('/admin/user/delete/{id}', name: 'app_admin_user_delete', methods: ['POST'])]
     public function deleteUser(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
+        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+            return $this->redirectToRoute('app');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
 
             $user->setState(UserState::DELETED);
@@ -87,6 +95,10 @@ final class AdminController extends AbstractController
     #[Route('/admin/user/lock/{id}', name: 'app_admin_user_lock', methods: ['POST'])]
     public function lockUser(User $user, Request $request, EntityManagerInterface $em): Response
     {
+        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+            return $this->redirectToRoute('app');
+        }
+
         if ($this->isCsrfTokenValid('lock'.$user->getId(), $request->request->get('_token'))) {
             $user->setState(UserState::LOCKED); // <- enum
             $em->flush();
@@ -97,6 +109,10 @@ final class AdminController extends AbstractController
     #[Route('/admin/user/unlock/{id}', name: 'app_admin_user_unlock', methods: ['POST'])]
     public function unlockUser(User $user, Request $request, EntityManagerInterface $em): Response
     {
+        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+            return $this->redirectToRoute('app');
+        }
+
         if ($this->isCsrfTokenValid('unlock'.$user->getId(), $request->request->get('_token'))) {
             $user->setState(UserState::ACTIVE); // <- enum
             $em->flush();
@@ -108,6 +124,10 @@ final class AdminController extends AbstractController
     #[Route('/admin/tags', name: 'app_admin_tag_index')]
     public function tags(ReportTagRepository $reportTagRepository): Response
     {
+        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+            return $this->redirectToRoute('app');
+        }
+
         return $this->render('admin/tag_index.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,
             'is_admin' => $this->requestStack->getSession()->get("role") == UserRole::ADMIN,
@@ -118,6 +138,10 @@ final class AdminController extends AbstractController
     #[Route('/admin/tags/add', name: 'app_admin_tag_add', methods: ['GET', 'POST'])]
     public function addTag(Request $request, EntityManagerInterface $entityManager): Response
     {
+        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+            return $this->redirectToRoute('app');
+        }
+
         $tag = new ReportTag();
         $form = $this->createForm(ReportTagType::class, $tag);
         $form->handleRequest($request);
@@ -140,6 +164,10 @@ final class AdminController extends AbstractController
     #[Route('/admin/tags/{id}/edit', name: 'app_admin_tag_edit', methods: ['GET', 'POST'])]
     public function editTag(Request $request, ReportTag $reportTag, EntityManagerInterface $entityManager): Response
     {
+        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+            return $this->redirectToRoute('app');
+        }
+
         $form = $this->createForm(ReportTagType::class, $reportTag);
         $form->handleRequest($request);
 
@@ -160,6 +188,10 @@ final class AdminController extends AbstractController
     #[Route('/admin/tags/{id}', name: 'app_admin_tag_delete', methods: ['POST'])]
     public function deleteTag(Request $request, ReportTag $tag, EntityManagerInterface $entityManager): Response
     {
+        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+            return $this->redirectToRoute('app');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$tag->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($tag);
             $entityManager->flush();
