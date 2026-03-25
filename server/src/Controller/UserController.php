@@ -157,9 +157,9 @@ final class UserController extends AbstractController
             return $this->redirectToRoute('app_my_account', [], Response::HTTP_SEE_OTHER);
         }
 
-        # TODO: Remove these fields for non-admin users only
         $form->remove("role");
         $form->remove("state");
+        $form->remove("login");
 
         return $this->render('user/edit.html.twig', [
             'is_logged' => $this->requestStack->getSession()->get("login") != null,

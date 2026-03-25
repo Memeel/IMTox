@@ -2,4 +2,79 @@
     {{ form_widget(form) }}
     <input type="hidden" name="_token" value="{{ csrf_token('user' ~ user.id) }}">
     <button class="btn">{{ button_label|default('Save') }}</button>
+
+    <style>
+        /* Container styling */
+        .content {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-family: sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Target the divs wrapping each input pair */
+        #user > div {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        /* Label styling */
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        /* Add a red asterisk to required labels */
+        label.required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+
+        /* Input styling */
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 4px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Button styling */
+        form > .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        form > .btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
 {{ form_end(form) }}
