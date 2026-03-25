@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-
+// Auteurs: Sadok LAJMI, Mélina WANG
 final class NewsReportController extends AbstractController
 {
     public function __construct(
@@ -183,7 +183,6 @@ final class NewsReportController extends AbstractController
         return $this->redirectToRoute('show_articles', ['state' => 'draft', 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
     }
 
-    // Auteurs: Sadok LAJMI, Mélina WANG
     private function applySaveAction(NewsReport $newsReport, string $saveAction): void
     {
         $now = new DateTimeImmutable();
