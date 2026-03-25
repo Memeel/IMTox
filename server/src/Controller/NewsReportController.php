@@ -69,7 +69,7 @@ final class NewsReportController extends AbstractController
             $entityManager->persist($newsReport);
             $entityManager->flush();
 
-            return $this->redirectToRoute('show_articles', ['state' => $newsReport->getState()->value, 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('show_articles', ['state' => $newsReport->getState()->value], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('news_report/new.html.twig', [
@@ -125,7 +125,7 @@ final class NewsReportController extends AbstractController
             $this->applySaveAction($newsReport, $request->request->getString('save_action'));
             $entityManager->flush();
 
-            return $this->redirectToRoute('show_articles', ['state' => $newsReport->getState()->value, 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('show_articles', ['state' => $newsReport->getState()->value], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('news_report/edit.html.twig', [
@@ -160,7 +160,7 @@ final class NewsReportController extends AbstractController
         $newsReportRepository->changeState($newsReport->getId(), $articleState);
         $entityManager->flush();
          
-        return $this->redirectToRoute('show_articles', ['state' => $state, 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('show_articles', ['state' => $state], Response::HTTP_SEE_OTHER);
     }
 
     #[Route('/article/delete/{id}', name: 'delete_report', methods: ['POST'], requirements: ['id' => '\\d+'])]
@@ -180,7 +180,7 @@ final class NewsReportController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('show_articles', ['state' => 'draft', 'authorId' => $request->getSession()->get('id')], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('show_articles', ['state' => 'draft'], Response::HTTP_SEE_OTHER);
     }
 
     private function applySaveAction(NewsReport $newsReport, string $saveAction): void

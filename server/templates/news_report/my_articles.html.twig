@@ -21,8 +21,8 @@
 
         <div class="nav-links">
             {% if authorId %}
-                <a href="{{ path('show_articles', { 'state': 'draft', 'authorId': authorId }) }}">Drafts</a>
-                <a href="{{ path('show_articles', { 'state': 'published', 'authorId': authorId }) }}">Published</a>
+                <a href="{{ path('show_articles', { 'state': 'draft' }) }}">Drafts</a>
+                <a href="{{ path('show_articles', { 'state': 'published' }) }}">Published</a>
             {% else %}
                 <a href="{{ path('app_user_login') }}">Drafts</a>
                 <a href="{{ path('app_user_login') }}">Published</a>
