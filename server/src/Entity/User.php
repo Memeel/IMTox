@@ -23,9 +23,9 @@ class User implements
     private ?int $id = null;
 
     #[ORM\Column(length: 255, unique: true, nullable: false)]
-    private ?string $login = null;
+    private string $login;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $password = null;
 
     #[ORM\Column(length: 255, unique: true, nullable: false)]

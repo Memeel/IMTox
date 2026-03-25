@@ -80,19 +80,23 @@ final class AdminController extends AbstractController
     #[Route('/admin/user/delete/{id}', name: 'app_admin_user_delete', methods: ['POST'])]
     public function deleteUser(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
-        if($this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
+        if($user->getId() != $this->requestStack->getSession()->get("id") && $this->requestStack->getSession()->get("role") != UserRole::ADMIN) {
             return $this->redirectToRoute('app');
         }
 
         if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
 
             $user->setState(UserState::DELETED);
-            $user->setMail(null);
-            $user->setLogin(null);
+            $user->setLogin("deleted" . strval($user->getId()));
+            $user->setMail("deleted" . strval($user->getId()));
             $user->setPassword(null);
             $user->setRole(null);
 
             $entityManager->flush();
+        }
+
+        if($user->getId() == $this->requestStack->getSession()->get("id")) {
+            $this->requestStack->getSession()->clear();
         }
 
         return $this->redirectToRoute('app_admin_users', [], Response::HTTP_SEE_OTHER);
